@@ -46,7 +46,7 @@ public class Player
         for (Model.POJO.Player p : resultList)
         {
             Model.POJO.Name n = p.getName();
-            System.out.println(p.getPersonID() + "\t" + n.getFirstName() + "\t" + n.getMiddleName() + "\t" + n.getLastName());
+            System.out.println("\t" + n.getFirstName() + "\t" + n.getMiddleName() + "\t" + n.getLastName());
         }
     }
 

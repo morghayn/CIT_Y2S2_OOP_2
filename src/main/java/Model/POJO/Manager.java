@@ -4,22 +4,17 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.io.Serializable;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "manager")
 @PrimaryKeyJoinColumn(name = "personID")
-public class Manager extends Person implements Serializable
+public class Manager extends Person
 {
-
-    private static final long serialVersionUID = 1L;
-
     private String dateOfBirth;
     private int starRating;
 
-    // TODO manager knows the team they manage
+    // TODO manager knows the team they manage?
 
     public Manager()
     {
@@ -37,5 +32,4 @@ public class Manager extends Person implements Serializable
         setDateOfBirth(dateOfBirth);
         setStarRating(starRating);
     }
-
 }

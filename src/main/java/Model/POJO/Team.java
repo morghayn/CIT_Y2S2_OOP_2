@@ -4,21 +4,16 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.util.List;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "team")
-public class Team implements Serializable
+public class Team
 {
-
-    private static final long serialVersionUID = 1L;
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int teamID;
+    private Long teamID;
     private String name;
     private String jerseyColour;
 
