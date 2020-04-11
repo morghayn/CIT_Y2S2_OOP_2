@@ -19,6 +19,8 @@ public class Manager extends Person implements Serializable
     private String dateOfBirth;
     private int starRating;
 
+    // TODO manager knows the team they manage
+
     public Manager()
     {
 
