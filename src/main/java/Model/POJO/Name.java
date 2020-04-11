@@ -3,16 +3,17 @@ package Model.POJO;
 import javax.persistence.*;
 import java.io.Serializable;
 
-@Entity
-@Table(name = "name")
+//@Entity
+//@Table(name = "name")
+@Embeddable
 public class Name implements Serializable
 {
 
     private static final long serialVersionUID = 1L;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int nameID;
+    //@Id
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
+    //private int nameID;
 
     @Column(name = "firstName")
     private String firstName;
@@ -32,15 +33,15 @@ public class Name implements Serializable
         this.lastName = lastName;
     }
 
-	public int getNameID()
-	{
-		return nameID;
-	}
+	//public int getNameID()
+	//{
+		//return nameID;
+	//}
 
-	public void setNameID(int nameID)
-	{
-		this.nameID = nameID;
-	}
+	//public void setNameID(int nameID)
+	//{
+		//this.nameID = nameID;
+	//}
 
 	public String getFirstName()
 	{

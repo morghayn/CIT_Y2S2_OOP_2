@@ -15,15 +15,16 @@ public class Person implements Serializable
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int personID;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "nameID")
-    protected Name name;
-
     @Column(name = "phone")
     protected String phone;
 
     @Column(name = "email")
     protected String email;
+
+    //@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    //@JoinColumn(name = "nameID")
+    @Embedded
+    protected Name name;
 
     public Person() {}
 

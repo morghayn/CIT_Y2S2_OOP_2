@@ -54,7 +54,8 @@ public class Player
     {
         System.out.println("-- all Players--");
         EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager(); // TODO i believe more queries than is necessary is occurring for name
-        TypedQuery<Model.POJO.Player> query = em.createQuery("SELECT p FROM Player p", Model.POJO.Player.class);
+        //TypedQuery<Model.POJO.Player> query = em.createQuery("SELECT p FROM Player p", Model.POJO.Player.class);
+        TypedQuery<Model.POJO.Player> query = em.createQuery("FROM Player p", Model.POJO.Player.class);
         List<Model.POJO.Player> resultList = query.getResultList();
         //resultList.forEach(System.out::println);
         for (Model.POJO.Player p : resultList)
