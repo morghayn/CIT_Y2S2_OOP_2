@@ -1,12 +1,15 @@
 package Model.POJO;
 
+import lombok.Data;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
 @Table(name = "manager")
-@PrimaryKeyJoinColumn(name="personID")
-public class Manager extends Person implements Serializable
+@PrimaryKeyJoinColumn(name = "personID")
+public @Data
+class Manager extends Person implements Serializable
 {
 
     private static final long serialVersionUID = 1L;
@@ -17,8 +20,11 @@ public class Manager extends Person implements Serializable
     @Column(name = "starRating")
     private int starRating;
 
-	public Manager() {}
+    public Manager()
+    {
+    }
 
+    /*
     public Manager(Person person, String dateOfBirth, int starRating)
     {
         super(
@@ -30,25 +36,6 @@ public class Manager extends Person implements Serializable
         setDateOfBirth(dateOfBirth);
         setStarRating(starRating);
     }
-
-	public String getDateOfBirth()
-	{
-		return dateOfBirth;
-	}
-
-	public void setDateOfBirth(String dateOfBirth)
-	{
-		this.dateOfBirth = dateOfBirth;
-	}
-
-	public int getStarRating()
-	{
-		return starRating;
-	}
-
-	public void setStarRating(int starRating)
-	{
-		this.starRating = starRating;
-	}
+    */
 
 }

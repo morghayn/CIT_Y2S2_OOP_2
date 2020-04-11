@@ -12,7 +12,7 @@ public class Main
 
         Model.POJO.Name name2 = new Name("Booby", "Frank", "Bob");
 
-      //  Model.DAO.Player.getPlayers();
+        Model.DAO.Player.getPlayers();
 
     }
 

@@ -1,12 +1,15 @@
 package Model.POJO;
 
+import lombok.Data;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "person")
-public class Person implements Serializable
+public @Data
+class Person implements Serializable
 {
 
     private static final long serialVersionUID = 1L;
@@ -28,50 +31,13 @@ public class Person implements Serializable
 
     public Person() {}
 
+    /*
     public Person(Name name, String phone, String email)
     {
         this.name = name;
         this.phone = phone;
         this.email = email;
     }
+    */
 
-    public int getPersonID()
-    {
-        return personID;
-    }
-
-    public void setPersonID(int personID)
-    {
-        this.personID = personID;
-    }
-
-    public Name getName()
-    {
-        return name;
-    }
-
-    public void setName(Name name)
-    {
-        this.name = name;
-    }
-
-    public String getPhone()
-    {
-        return phone;
-    }
-
-    public void setPhone(String phone)
-    {
-        this.phone = phone;
-    }
-
-    public String getEmail()
-    {
-        return email;
-    }
-
-    public void setEmail(String email)
-    {
-        this.email = email;
-    }
 }
