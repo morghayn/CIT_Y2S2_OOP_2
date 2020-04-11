@@ -1,30 +1,29 @@
 package Model.POJO;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "manager")
 @PrimaryKeyJoinColumn(name = "personID")
-public @Data
-class Manager extends Person implements Serializable
+public class Manager extends Person implements Serializable
 {
 
     private static final long serialVersionUID = 1L;
 
-    @Column(name = "dateOfBirth")
     private String dateOfBirth;
-
-    @Column(name = "starRating")
     private int starRating;
 
     public Manager()
     {
+
     }
 
-    /*
     public Manager(Person person, String dateOfBirth, int starRating)
     {
         super(
@@ -36,6 +35,5 @@ class Manager extends Person implements Serializable
         setDateOfBirth(dateOfBirth);
         setStarRating(starRating);
     }
-    */
 
 }
