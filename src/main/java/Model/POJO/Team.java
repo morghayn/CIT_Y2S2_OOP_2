@@ -35,5 +35,4 @@ public class Team
         this.name = name;
         this.jerseyColour = jerseyColour;
     }
-
 }

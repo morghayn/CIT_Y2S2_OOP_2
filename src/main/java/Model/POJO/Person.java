@@ -31,5 +31,4 @@ public class Person
         this.phone = phone;
         this.email = email;
     }
-
 }
