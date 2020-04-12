@@ -36,7 +36,7 @@ public class League
         }
     }
 
-    public static void deleteTeam(int id) // TODO Maybe change to a team object
+    public static void deleteTeam(Long id) // TODO Maybe change to a team object
     {
         EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
         EntityTransaction et = null;

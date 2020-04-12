@@ -6,6 +6,7 @@ import java.util.List;
 public class Player
 {
     private static final EntityManagerFactory ENTITY_MANAGER_FACTORY = Persistence.createEntityManagerFactory("league");
+    // TODO we can already update numGoals straight from the POJO...
 
     public static void addPlayer(Model.POJO.Player player)
     {
@@ -34,26 +35,15 @@ public class Player
         }
     }
 
-    public static void getPlayers()
+    public static List<Player> getPlayers()
     {
-        System.out.println("-- all Players--");
-
         EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
-        TypedQuery<Model.POJO.Player> query = em.createQuery("FROM Player p", Model.POJO.Player.class);
-        List<Model.POJO.Player> resultList = query.getResultList();
 
-        //resultList.forEach(System.out::println);
-        for (Model.POJO.Player p : resultList)
-        {
-            Model.POJO.Name n = p.getName();
-            System.out.println("\t" + n.getFirstName() + "\t" + n.getMiddleName() + "\t" + n.getLastName());
-        }
-    }
+        TypedQuery<Player> query = em.createQuery("FROM Player p", Player.class);
+        List<Player> resultList = query.getResultList();
 
-    // TODO update, change, add?
-    public static void alterNumGoals()
-    {
-
+        em.close();
+        return resultList;
     }
 
 }

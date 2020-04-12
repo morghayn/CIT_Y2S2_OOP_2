@@ -17,11 +17,11 @@ public class Team
     private String name;
     private String jerseyColour;
 
-    @JoinColumn(name = "teamID")
     @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "teamID")
     private List<Player> players;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.DETACH) // TODO is this enabling us to delete part of our bidirectional relationship -- INVESTIGATE!
     @JoinColumn(name = "managerID")
     private Manager manager;
 
