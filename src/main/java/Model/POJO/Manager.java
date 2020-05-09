@@ -14,7 +14,7 @@ public class Manager extends Person
     private String dateOfBirth;
     private int starRating;
 
-    /**
+                                                    /**
      * I only included this bi-directional relationship here because I felt the brief was specified for this to be included:
      * "The manager knows which Team he/she manages." ~ The project specification
      * One-To-One Bidirectional Join Column
