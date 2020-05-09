@@ -1,15 +1,21 @@
 package Model.DAO;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
+import Model.POJO.Player;
+import Model.POJO.Team;
 
-public class League
+import javax.persistence.*;
+import java.util.List;
+
+public class TeamDAO
 {
-    private static final EntityManagerFactory ENTITY_MANAGER_FACTORY = Persistence.createEntityManagerFactory("league");
+    private final EntityManagerFactory ENTITY_MANAGER_FACTORY;
 
-    public static void addTeam(Model.POJO.Team team)
+    public TeamDAO(EntityManagerFactory ENTITY_MANAGER_FACTORY)
+    {
+        this.ENTITY_MANAGER_FACTORY = ENTITY_MANAGER_FACTORY;
+    }
+
+    public void update(Team team)
     {
         EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
         EntityTransaction et = null;
@@ -19,7 +25,7 @@ public class League
             et = em.getTransaction();
             et.begin();
 
-            em.persist(team);
+            em.merge(team);
             et.commit();
         }
         catch (Exception ex)
@@ -36,18 +42,24 @@ public class League
         }
     }
 
-    public static void removeTeam(Model.POJO.Team team)
+    public void update(long id)
+    {
+        update(getTeam(id));
+    }
+
+    public Team getTeam(long teamID)
     {
         EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
         EntityTransaction et = null;
+        Team team = null;
 
         try
         {
             et = em.getTransaction();
             et.begin();
 
-            team = em.find(Model.POJO.Team.class, team.getTeamID());
-            em.remove(team);
+            team = em.find(Model.POJO.Team.class, teamID);
+
             et.commit();
         }
         catch (Exception ex)
@@ -62,22 +74,24 @@ public class League
         {
             em.close();
         }
+
+        return team;
     }
 
-
-
-    /*
-    public static void addTeam(Model.POJO.Team team)
+    public List<Team> getTeams()
     {
         EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
         EntityTransaction et = null;
+        List<Team> teams = null;
 
         try
         {
             et = em.getTransaction();
             et.begin();
 
-            em.persist(team);
+            TypedQuery<Team> query = em.createNamedQuery("Team.Retrieve", Team.class);
+            teams = query.getResultList();
+
             et.commit();
         }
         catch (Exception ex)
@@ -92,35 +106,8 @@ public class League
         {
             em.close();
         }
+
+        return teams;
     }
 
-    public static void deleteTeam(Long id) // TODO Maybe change to a team object
-    {
-        EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
-        EntityTransaction et = null;
-        Model.POJO.Team team;
-
-        try
-        {
-            et = em.getTransaction();
-            et.begin();
-
-            team = em.find(Model.POJO.Team.class, id);
-            em.remove(team);
-            et.commit();
-        }
-        catch (Exception ex)
-        {
-            if (et != null)
-            {
-                et.rollback();
-            }
-            ex.printStackTrace();
-        }
-        finally
-        {
-            em.close();
-        }
-    }
-     */
 }

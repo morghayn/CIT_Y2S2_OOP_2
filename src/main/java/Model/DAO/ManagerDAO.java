@@ -1,15 +1,17 @@
 package Model.DAO;
 
+import Model.POJO.Manager;
 import Model.POJO.Player;
+import Model.POJO.Team;
 
 import javax.persistence.*;
 import java.util.List;
 
-public class Manager
+public class ManagerDAO
 {
     private static final EntityManagerFactory ENTITY_MANAGER_FACTORY = Persistence.createEntityManagerFactory("league");
 
-    public static void persist(Model.POJO.Manager manager)
+    public static void persist(Manager manager)
     {
         EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
         EntityTransaction et = null;
@@ -36,25 +38,19 @@ public class Manager
         }
     }
 
-    public static void update(Model.POJO.Manager manager)
-    {
-        // TODO
-    }
-
-
-
-    /*
-    public static void addManager(Model.POJO.Manager manager)
+    public static void update(long id)
     {
         EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
         EntityTransaction et = null;
+        Manager manager;
 
         try
         {
             et = em.getTransaction();
             et.begin();
 
-            em.persist(manager);
+            manager = em.find(Manager.class, id);
+            em.remove(manager);
             et.commit();
         }
         catch (Exception ex)
@@ -71,21 +67,36 @@ public class Manager
         }
     }
 
-    public static List<Model.POJO.Manager> getManagers()
+    public List<Manager> getManagers()
     {
         EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
+        EntityTransaction et = null;
+        List<Manager> managers = null;
 
-        TypedQuery<Model.POJO.Manager> query = em.createQuery("FROM Manager p", Model.POJO.Manager.class);
-        List<Model.POJO.Manager> resultList = query.getResultList();
-
-        for (Model.POJO.Manager manager : resultList)
+        try
         {
-            System.out.println("PersonID:\t" + manager.getPersonID());
-            Model.POJO.Team team = manager.getTeam();
-            System.out.println("\tTeam Name:\t" + (team == null ? "Team is NULL" : manager.getTeam().getName()));
+            et = em.getTransaction();
+            et.begin();
+
+            TypedQuery<Manager> query = em.createNamedQuery("Manager.Retrieve", Manager.class);
+            managers = query.getResultList();
+
+            et.commit();
         }
-        em.close();
-        return resultList;
+        catch (Exception ex)
+        {
+            if (et != null)
+            {
+                et.rollback();
+            }
+            ex.printStackTrace();
+        }
+        finally
+        {
+            em.close();
+        }
+
+        return managers;
     }
-    */
+
 }

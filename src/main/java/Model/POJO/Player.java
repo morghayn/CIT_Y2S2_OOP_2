@@ -2,13 +2,17 @@ package Model.POJO;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 
 @Getter
 @Setter
 @Entity
+@NamedQuery(name="Player.Retrieve", query="SELECT p FROM Player p")
 @PrimaryKeyJoinColumn(name = "personID")
+//@OnDelete(action = OnDeleteAction.CASCADE)
 public class Player extends Person
 {
     private boolean goalie;

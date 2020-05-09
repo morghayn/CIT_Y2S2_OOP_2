@@ -1,13 +1,18 @@
 package Controller;
 
-import Model.POJO.Manager;
+import Model.DAO.LeagueDAO;
+import Model.DAO.PlayerDAO;
+import Model.DAO.TeamDAO;
 import Model.POJO.Name;
+import Model.POJO.Person;
 import Model.POJO.Player;
 import Model.POJO.Team;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Main
 {
@@ -17,57 +22,86 @@ public class Main
 
     public static void main(String[] args)
     {
-        Model.POJO.Name name = new Name("Jim-", "Jim-", "Bob-");
-        Model.POJO.Player manager = new Player();
-        manager.setName(name);
-        manager.setNumGoals(5);
-        manager.setGoalie(false);
-        manager.setEmail("morgan.nolan@hotmail.com");
+        PlayerDAO playerDAO = new PlayerDAO(ENTITY_MANAGER_FACTORY);
+
+        Person person = playerDAO.getPerson(2);
+        //System.out.println(person.getPersonID());
+
+        playerDAO.remove(person);
+
+        //playerDAO.removePlayer(playerDAO.getPlayer(1));
+
+        // addPlayersToTeamDemo();
+        // getTeamPlayersDemo();
+        // addPlayerDemo();
+    }
+
+    public static void addPlayersToTeamDemo()
+    {
+        PlayerDAO playerDAO = new PlayerDAO(ENTITY_MANAGER_FACTORY);
+        LeagueDAO leagueDAO = new LeagueDAO(ENTITY_MANAGER_FACTORY);
+        //getTeamPlayersDemo();
 
         Model.POJO.Team team = new Team();
         team.setJerseyColour("Red");
-        team.setName("mmmmmmm");
-      //  team.setManager(manager);
+        team.setName("Peppers");
 
+        for(int i = 0; i < 15; i++)
+        {
+            Name name = new Name("Jim" + i, "Jim" + i, "Bob" + i);
+            Player player = new Player();
+            player.setName(name);
+            player.setNumGoals(5);
+            player.setGoalie(false);
+            player.setEmail("morgan.nolan@hotmail.com + i");
 
-        manager.setTeam(team);
+            // adding player to database
+            playerDAO.persist(player);
 
-        EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
-        Model.DAO.Player dm = new Model.DAO.Player(em);
+            // adding player to team's player list
+            team.getPlayers().add(player);
+        }
 
-        Model.DAO.League.addTeam(team);
-        dm.persist(manager);
-
-       // System.out.println(team.getManager().getName().getFirstName());
-
-
-        //System.out.println("> Before deleting");
-        //Model.DAO.Manager.getManagers();
-
-        Model.DAO.League.removeTeam(team); // TODO change this here to object instance <---
-
-        manager.getName().setFirstName("Morgan");
-        dm.update(manager);
-        //System.out.println("> After deleting");
-        //Model.DAO.Manager.getManagers();
+        // adding team to database
+        leagueDAO.addTeam(team);
+        // *JPA SHOULD UPDATE ALL THE PLAYER's TEAM COLUMN HERE*
     }
 
-/*
-        for (int i = 0; i < 5; i++)
+    public static void getTeamPlayersDemo()
+    {
+        TeamDAO teamDAO = new TeamDAO(ENTITY_MANAGER_FACTORY);
+
+        Team team = teamDAO.getTeam((long) 1);
+        List<Player> players = team.getPlayers();
+
+        for(Player player : players)
         {
-            Model.POJO.Name name = new Name("Jim-" + i, "Jim-" + i, "Bob-" + i);
-
-            Model.POJO.Player player = new Model.POJO.Player();
-            player.setName(name);
-            player.setPhone("0873539835");
-            player.setEmail("morgan.nolan@hotmail.com");
-            player.setGoalie(true);
-            player.setNumGoals(0);
-
-            Model.DAO.Player.addPlayer(player);
+            System.out.println(player.getName().getFirstName());
         }
-*/
+    }
 
-    // Model.DAO.Player.getPlayers();
+    public static void addPlayerDemo()
+    {
+        PlayerDAO playerDAO = new PlayerDAO(ENTITY_MANAGER_FACTORY);
+        TeamDAO teamDAO = new TeamDAO(ENTITY_MANAGER_FACTORY);
+        Team team = teamDAO.getTeam((long) 1);
+
+        Name name = new Name("I have no team :(", "Jim", "Bob");
+        Player player = new Player();
+        player.setName(name);
+        player.setNumGoals(5);
+        player.setGoalie(false);
+        player.setEmail("morgan.nolan@hotmail.com");
+
+        playerDAO.persist(player);
+
+        team.addPlayer(player);
+        teamDAO.update(team);
+
+        //team = teamDAO.getTeam((long) 1);
+        team.removePlayer(player);
+        teamDAO.update(team);
+        playerDAO.update(player);
+    }
 
 }
