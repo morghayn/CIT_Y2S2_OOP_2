@@ -1,3 +1,9 @@
+import Controller.Controller;
+import View.Create;
+import View.Delete;
+import View.Home;
+import View.Retrieve;
+
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -6,8 +12,14 @@ import javafx.scene.control.TabPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+
 public class Main extends Application
 {
+
+    private final EntityManagerFactory ENTITY_MANAGER_FACTORY = Persistence.createEntityManagerFactory("league");
+    private Controller controller;
     private TabPane tabPane;
 
     @Override
@@ -17,10 +29,10 @@ public class Main extends Application
         {
             BorderPane mainPane = new BorderPane();
             Group root = new Group();
-            primaryStage.setTitle("My Carbon Awareness Effort");
+            primaryStage.setTitle("League Management System");
             Scene scene = new Scene(root, 700, 410);
 
-            setupTabPane();
+            setup();
 
             mainPane.setCenter(tabPane);
             mainPane.prefHeightProperty().bind(scene.heightProperty());
@@ -36,18 +48,27 @@ public class Main extends Application
         }
     }
 
-    private void setupTabPane()
+    private void setup()
     {
+        controller = new Controller(ENTITY_MANAGER_FACTORY);
+
         tabPane = new TabPane();
-        Tab introduction = new Tab();
-        Tab activityManagement = new Tab();
-        Tab results = new Tab();
+        Tab home = new Tab();
+        Tab create = new Tab();
+        Tab retrieve = new Tab();
+        Tab delete = new Tab();
 
-        introduction.setText("Introduction");
-        activityManagement.setText("Activity Management");
-        results.setText("Results");
+        home.setText("Home");
+        create.setText("Create");
+        retrieve.setText("Retrieve");
+        delete.setText("Delete");
 
-        tabPane.getTabs().addAll(introduction, activityManagement, results);
+        home.setContent(new Home().setup());
+        create.setContent(new Create().setup());
+        retrieve.setContent(new Retrieve(controller).setup());
+        delete.setContent(new Delete().setup());
+
+        tabPane.getTabs().addAll(home, create, retrieve, delete);
     }
 
     public static void main(String[] args)

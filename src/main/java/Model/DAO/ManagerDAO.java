@@ -9,9 +9,15 @@ import java.util.List;
 
 public class ManagerDAO
 {
-    private static final EntityManagerFactory ENTITY_MANAGER_FACTORY = Persistence.createEntityManagerFactory("league");
 
-    public static void persist(Manager manager)
+    private final EntityManagerFactory ENTITY_MANAGER_FACTORY;
+
+    public ManagerDAO(EntityManagerFactory ENTITY_MANAGER_FACTORY)
+    {
+        this.ENTITY_MANAGER_FACTORY = ENTITY_MANAGER_FACTORY;
+    }
+
+    public void persist(Manager manager)
     {
         EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
         EntityTransaction et = null;
@@ -38,19 +44,44 @@ public class ManagerDAO
         }
     }
 
-    public static void update(long id)
+    public void update(Manager manager)
     {
         EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
         EntityTransaction et = null;
-        Manager manager;
 
         try
         {
             et = em.getTransaction();
             et.begin();
 
-            manager = em.find(Manager.class, id);
             em.remove(manager);
+            et.commit();
+        }
+        catch (Exception ex)
+        {
+            if (et != null)
+            {
+                et.rollback();
+            }
+            ex.printStackTrace();
+        }
+        finally
+        {
+            em.close();
+        }
+    }
+
+    public void remove(Manager manager)
+    {
+        EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
+        EntityTransaction et = null;
+
+        try
+        {
+            et = em.getTransaction();
+            et.begin();
+
+            em.remove(em.contains(manager) ? manager : em.merge(manager));
             et.commit();
         }
         catch (Exception ex)

@@ -9,6 +9,7 @@ import java.util.List;
 
 public class PlayerDAO
 {
+
     private final EntityManagerFactory ENTITY_MANAGER_FACTORY;
 
     public PlayerDAO(EntityManagerFactory ENTITY_MANAGER_FACTORY)

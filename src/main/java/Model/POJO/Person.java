@@ -33,4 +33,19 @@ public class Person
         this.phone = phone;
         this.email = email;
     }
+
+    public String getFirstName()
+    {
+        return name.getFirstName();
+    }
+
+    public String getMiddleName()
+    {
+        return name.getMiddleName();
+    }
+
+    public String getLastName()
+    {
+        return name.getLastName();
+    }
 }

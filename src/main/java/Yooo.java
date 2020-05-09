@@ -1,18 +1,14 @@
-import Model.DAO.LeagueDAO;
 import Model.DAO.PlayerDAO;
 import Model.DAO.TeamDAO;
 import Model.POJO.Name;
-import Model.POJO.Person;
 import Model.POJO.Player;
 import Model.POJO.Team;
 
-import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-import java.util.ArrayList;
 import java.util.List;
 
-public class Controller
+public class Yooo
 {
 
     private static final EntityManagerFactory ENTITY_MANAGER_FACTORY = Persistence.createEntityManagerFactory("league");
@@ -37,7 +33,6 @@ public class Controller
     public static void addPlayersToTeamDemo()
     {
         PlayerDAO playerDAO = new PlayerDAO(ENTITY_MANAGER_FACTORY);
-        LeagueDAO leagueDAO = new LeagueDAO(ENTITY_MANAGER_FACTORY);
         //getTeamPlayersDemo();
 
         Model.POJO.Team team = new Team();
@@ -61,7 +56,6 @@ public class Controller
         }
 
         // adding team to database
-        leagueDAO.addTeam(team);
         // *JPA SHOULD UPDATE ALL THE PLAYER's TEAM COLUMN HERE*
     }
 

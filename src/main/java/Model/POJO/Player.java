@@ -27,7 +27,7 @@ public class Player extends Person
 
     }
 
-    public Player(Person person, boolean goalie)
+    public Player(Person person, int numGoals, boolean goalie)
     {
         super(
                 person.getName(),
@@ -35,7 +35,7 @@ public class Player extends Person
                 person.getEmail()
         );
 
-        numGoals = 0;
+        this.numGoals = numGoals;
         this.goalie = goalie;
     }
 }
