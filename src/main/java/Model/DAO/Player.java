@@ -1,13 +1,72 @@
 package Model.DAO;
 
 import javax.persistence.*;
-import java.util.List;
 
 public class Player
 {
-    private static final EntityManagerFactory ENTITY_MANAGER_FACTORY = Persistence.createEntityManagerFactory("league");
-    // TODO we can already update numGoals straight from the POJO...
+   // private static final EntityManagerFactory ENTITY_MANAGER_FACTORY = Persistence.createEntityManagerFactory("league");
 
+    private EntityManager em;
+
+    public Player(EntityManager em) {
+        this.em = em;
+    }
+
+    public void persist(Model.POJO.Player player)
+    {
+       // EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
+        EntityTransaction et = null;
+
+        try
+        {
+            et = em.getTransaction();
+            et.begin();
+
+            em.persist(player);
+            et.commit();
+        }
+        catch (Exception ex)
+        {
+            if (et != null)
+            {
+                et.rollback();
+            }
+            ex.printStackTrace();
+        }
+        finally
+        {
+           // em.close();
+        }
+    }
+
+    public void update(Model.POJO.Player player)
+    {
+        EntityTransaction et = null;
+
+        try
+        {
+            et = em.getTransaction();
+            et.begin();
+
+            em.merge(player);
+            et.commit();
+        }
+        catch (Exception ex)
+        {
+            if (et != null)
+            {
+                et.rollback();
+            }
+            ex.printStackTrace();
+        }
+        finally
+        {
+           // em.close();
+        }
+    }
+
+
+    /*
     public static void addPlayer(Model.POJO.Player player)
     {
         EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
@@ -45,5 +104,6 @@ public class Player
         em.close();
         return resultList;
     }
+    */
 
 }

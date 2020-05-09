@@ -9,6 +9,7 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
+@Embeddable
 public class Team
 {
     @Id
@@ -17,7 +18,7 @@ public class Team
     private String name;
     private String jerseyColour;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.DETACH)
     @JoinColumn(name = "teamID")
     private List<Player> players;
 

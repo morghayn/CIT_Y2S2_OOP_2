@@ -8,8 +8,42 @@ import java.util.List;
 public class Manager
 {
     private static final EntityManagerFactory ENTITY_MANAGER_FACTORY = Persistence.createEntityManagerFactory("league");
-    // TODO we already can get / set rating straight from the POJO?
 
+    public static void persist(Model.POJO.Manager manager)
+    {
+        EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
+        EntityTransaction et = null;
+
+        try
+        {
+            et = em.getTransaction();
+            et.begin();
+
+            em.persist(manager);
+            et.commit();
+        }
+        catch (Exception ex)
+        {
+            if (et != null)
+            {
+                et.rollback();
+            }
+            ex.printStackTrace();
+        }
+        finally
+        {
+            em.close();
+        }
+    }
+
+    public static void update(Model.POJO.Manager manager)
+    {
+        // TODO
+    }
+
+
+
+    /*
     public static void addManager(Model.POJO.Manager manager)
     {
         EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
@@ -53,5 +87,5 @@ public class Manager
         em.close();
         return resultList;
     }
-
+    */
 }
