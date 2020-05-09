@@ -52,7 +52,7 @@ public class TeamDAO
             et = em.getTransaction();
             et.begin();
 
-            em.remove(team);
+            em.remove(em.contains(team) ? team : em.merge(team));
             et.commit();
         }
         catch (Exception ex)

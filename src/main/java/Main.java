@@ -1,8 +1,8 @@
 import Controller.Controller;
-import View.Create;
-import View.Delete;
+import View.Players;
+import View.Managers;
 import View.Home;
-import View.Retrieve;
+import View.Teams;
 
 import javafx.application.Application;
 import javafx.scene.Group;
@@ -54,21 +54,21 @@ public class Main extends Application
 
         tabPane = new TabPane();
         Tab home = new Tab();
-        Tab create = new Tab();
-        Tab retrieve = new Tab();
-        Tab delete = new Tab();
+        Tab managers = new Tab();
+        Tab players = new Tab();
+        Tab teams = new Tab();
 
         home.setText("Home");
-        create.setText("Create");
-        retrieve.setText("Retrieve");
-        delete.setText("Delete");
+        managers.setText("Managers");
+        players.setText("Players");
+        teams.setText("Teams");
 
         home.setContent(new Home().setup());
-        create.setContent(new Create().setup());
-        retrieve.setContent(new Retrieve(controller).setup());
-        delete.setContent(new Delete().setup());
+        managers.setContent(new Managers(controller).setup());
+        players.setContent(new Players(controller).setup());
+        teams.setContent(new Teams(controller).setup());
 
-        tabPane.getTabs().addAll(home, create, retrieve, delete);
+        tabPane.getTabs().addAll(home, managers, players, teams);
     }
 
     public static void main(String[] args)

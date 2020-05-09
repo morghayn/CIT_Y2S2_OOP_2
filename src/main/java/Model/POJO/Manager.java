@@ -8,6 +8,7 @@ import javax.persistence.*;
 @Getter
 @Setter
 @Entity
+@NamedQuery(name="Manager.Retrieve", query="SELECT m FROM Manager m")
 @PrimaryKeyJoinColumn(name = "personID")
 public class Manager extends Person
 {
