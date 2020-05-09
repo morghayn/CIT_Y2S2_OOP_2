@@ -1,5 +1,3 @@
-package Controller;
-
 import Model.DAO.LeagueDAO;
 import Model.DAO.PlayerDAO;
 import Model.DAO.TeamDAO;
@@ -14,7 +12,7 @@ import javax.persistence.Persistence;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Main
+public class Controller
 {
 
     private static final EntityManagerFactory ENTITY_MANAGER_FACTORY = Persistence.createEntityManagerFactory("league");
@@ -22,12 +20,12 @@ public class Main
 
     public static void main(String[] args)
     {
-        PlayerDAO playerDAO = new PlayerDAO(ENTITY_MANAGER_FACTORY);
+        //PlayerDAO playerDAO = new PlayerDAO(ENTITY_MANAGER_FACTORY);
 
-        Person person = playerDAO.getPerson(2);
+       // Player player = playerDAO.find(2);
         //System.out.println(person.getPersonID());
 
-        playerDAO.remove(person);
+        //playerDAO.remove(player);
 
         //playerDAO.removePlayer(playerDAO.getPlayer(1));
 
