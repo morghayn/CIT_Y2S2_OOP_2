@@ -16,6 +16,7 @@ public class Yooo
 
     public static void main(String[] args)
     {
+        /*
         PlayerDAO playerDAO = new PlayerDAO(ENTITY_MANAGER_FACTORY);
 
         Name name = new Name("Pobby", "Jim", "Bob");
@@ -27,7 +28,10 @@ public class Yooo
         playerDAO.persist(player);
 
 
-        playerDAO.likeName("Jim");
+        playerDAO.searchName("Jim");
+*/
+
+
 
         // SELECT p FROM Person WHERE CONCAT(p.firstName, ' ', p.lastName) LIKE :search
         //PlayerDAO playerDAO = new PlayerDAO(ENTITY_MANAGER_FACTORY);
@@ -39,7 +43,7 @@ public class Yooo
 
         //playerDAO.removePlayer(playerDAO.getPlayer(1));
 
-        // addPlayersToTeamDemo();
+        addPlayersToTeamDemo();
         // getTeamPlayersDemo();
         // addPlayerDemo();
     }
@@ -50,12 +54,12 @@ public class Yooo
         //getTeamPlayersDemo();
 
         Model.POJO.Team team = new Team();
-        team.setJerseyColour("Red");
-        team.setName("Peppers");
+        team.setJerseyColour("Orange");
+        team.setName("JellyFish");
 
         for(int i = 0; i < 15; i++)
         {
-            Name name = new Name("Jim" + i, "Jim" + i, "Bob" + i);
+            Name name = new Name("Jelly " + i, "Pants " + i, "Nolan " + i);
             Player player = new Player();
             player.setName(name);
             player.setNumGoals(5);
@@ -68,6 +72,9 @@ public class Yooo
             // adding player to team's player list
             team.getPlayers().add(player);
         }
+
+        TeamDAO teamDAO = new TeamDAO(ENTITY_MANAGER_FACTORY);
+        teamDAO.update(team);
 
         // adding team to database
         // *JPA SHOULD UPDATE ALL THE PLAYER's TEAM COLUMN HERE*

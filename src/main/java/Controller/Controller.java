@@ -80,7 +80,10 @@ public class Controller
         return teamDAO.getTeams();
     }
 
-    // TODO searches here
+    public List<Player> searchName(String searchPhrase)
+    {
+        return playerDAO.searchName(searchPhrase);
+    }
 
     // Update
     public void updateManager(Manager manager)

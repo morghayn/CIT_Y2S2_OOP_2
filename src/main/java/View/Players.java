@@ -24,7 +24,6 @@ public class Players
 
     private Controller controller;
     private TableView<Player> tableView;
-    private VBox mainColumn;
 
     public Players(Controller controller)
     {
@@ -32,6 +31,40 @@ public class Players
     }
 
     public StackPane setup()
+    {
+        String[] columns = {"firstName", "middleName", "lastName", "phone", "email", "numGoals", "goalie"};
+        prepareTableView(columns);
+
+        Button viewTeamPlayers = new Button("Team Players");
+        viewTeamPlayers.setOnAction(this::teamPlayers);
+
+        VBox mainColumn = new VBox(25, prepareButtonBar(), prepareSearchBar(), viewTeamPlayers, tableView);
+        mainColumn.setPadding(new Insets(35, 20, 20, 20));
+
+        return new StackPane(mainColumn);
+    }
+
+    private HBox prepareSearchBar()
+    {
+        Label labelSearch = new Label("Search by Name");
+        TextField fieldSearch = new TextField();
+        Button buttonSearch = new Button("Search");
+        AppTheme.set(labelSearch);
+        AppTheme.set(buttonSearch);
+        buttonSearch.setOnAction
+                (e ->
+                 {
+                     List<Player> players = controller.searchName(fieldSearch.getText());
+                     tableView.getItems().clear();
+                     for (Player player : players)
+                     {
+                         tableView.getItems().add(player);
+                     }
+                 });
+        return new HBox(50, labelSearch, fieldSearch, buttonSearch);
+    }
+
+    private HBox prepareButtonBar()
     {
         Button create = new Button("Create");
         Button list = new Button("List");
@@ -47,45 +80,49 @@ public class Players
         list.setOnAction(e -> list());
         update.setOnAction(e -> update());
         delete.setOnAction(e -> delete());
-        HBox buttons = new HBox(50, create, list, update, delete);
+        return new HBox(50, create, list, update, delete);
+    }
 
-
+    public void prepareTableView(String[] columns)
+    {
         tableView = new TableView<>();
-        TableColumn<Player, String> column1, column2, column3, column4, column5, column6, column7;
-        column1 = new TableColumn<>("firstName");
-        column2 = new TableColumn<>("middleName");
-        column3 = new TableColumn<>("lastName");
-        column4 = new TableColumn<>("phone");
-        column5 = new TableColumn<>("email");
-        column6 = new TableColumn<>("numGoals");
-        column7 = new TableColumn<>("isGoalie");
-        column1.setCellValueFactory(new PropertyValueFactory<>("firstName"));
-        column2.setCellValueFactory(new PropertyValueFactory<>("middleName"));
-        column3.setCellValueFactory(new PropertyValueFactory<>("lastName"));
-        column4.setCellValueFactory(new PropertyValueFactory<>("phone"));
-        column5.setCellValueFactory(new PropertyValueFactory<>("email"));
-        column6.setCellValueFactory(new PropertyValueFactory<>("numGoals"));
-        column7.setCellValueFactory(new PropertyValueFactory<>("goalie"));
-        tableView.getColumns().add(column1);
-        tableView.getColumns().add(column2);
-        tableView.getColumns().add(column3);
-        tableView.getColumns().add(column4);
-        tableView.getColumns().add(column5);
-        tableView.getColumns().add(column6);
-        tableView.getColumns().add(column7);
-        column1.prefWidthProperty().bind(tableView.widthProperty().divide(7));
-        column2.prefWidthProperty().bind(tableView.widthProperty().divide(7));
-        column3.prefWidthProperty().bind(tableView.widthProperty().divide(7));
-        column4.prefWidthProperty().bind(tableView.widthProperty().divide(7));
-        column5.prefWidthProperty().bind(tableView.widthProperty().divide(7));
-        column6.prefWidthProperty().bind(tableView.widthProperty().divide(7));
-        column7.prefWidthProperty().bind(tableView.widthProperty().divide(7));
+        for (String columnName : columns)
+        {
+            TableColumn<Player, String> column = new TableColumn<>(columnName);
+            column.setCellValueFactory(new PropertyValueFactory<>(columnName));
+            tableView.getColumns().add(column);
+            column.prefWidthProperty().bind(tableView.widthProperty().divide(columns.length));
+        }
         tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+    }
 
+    public void list()
+    {
+        List<Player> players = controller.getPlayers();
+        tableView.getItems().clear();
+        for (Player player : players)
+        {
+            tableView.getItems().add(player);
+        }
+    }
 
-        VBox mainColumn = new VBox(50, buttons, tableView);
-        mainColumn.setPadding(new Insets(50, 20, 20, 20));
-        return new StackPane(mainColumn);
+    public void update()
+    {
+
+    }
+
+    public void delete()
+    {
+        if (tableView.getSelectionModel().getSelectedIndex() != -1)
+        {
+            Player player = tableView.getSelectionModel().getSelectedItem();
+            controller.deletePlayer(player);
+            list();
+        }
+        else
+        {
+            new PopupWindow("Removal Error", "No valid table selection.");
+        }
     }
 
     public void create(ActionEvent e)
@@ -149,33 +186,72 @@ public class Players
         return new StackPane(temp);
     }
 
-    public void list()
+    public void teamPlayers(ActionEvent e)
     {
-        List<Player> players = controller.getPlayers();
-        tableView.getItems().clear();
-        for (Player player : players)
-        {
-            tableView.getItems().add(player);
-        }
+        final Node source = (Node) e.getSource();
+        final Stage stage = (Stage) source.getScene().getWindow();
+
+        Group root = new Group();
+        Stage dialog = new Stage();
+        Scene temp = new Scene(root, 920, 300);
+        dialog.setScene(temp);
+        root.getChildren().add(teamPlayersPane());
+
+        dialog.centerOnScreen();
+
+        dialog.initOwner(stage);
+        dialog.initModality(Modality.APPLICATION_MODAL);
+        dialog.showAndWait();
     }
 
-    public void update()
+    public StackPane teamPlayersPane()
     {
+        Label labelTeam  = new Label("Select Team");
+        ComboBox<String> comboTeams = new ComboBox<>();
+        List<Team> teams = controller.getTeams();
 
-    }
+        for (Team team : teams)
+        {
+            comboTeams.getItems().add(team.getName());
+        }
 
-    public void delete()
-    {
-        if (tableView.getSelectionModel().getSelectedIndex() != -1)
-        {
-            Player player = tableView.getSelectionModel().getSelectedItem();
-            controller.deletePlayer(player);
-            list();
-        }
-        else
-        {
-            new PopupWindow("Removal Error", "No valid table selection.");
-        }
+        // :: instantiating and styling new buttons
+        Button buttonCreate = new Button("Create");
+        Button buttonCancel = new Button("Cancel");
+        AppTheme.set(buttonCreate);
+        AppTheme.set(buttonCancel);
+
+        buttonCreate.setOnAction(
+                e ->
+                {
+                    if (comboTeams.getSelectionModel().getSelectedIndex() != -1)
+                    {
+                        Team team = teams.get(comboTeams.getSelectionModel().getSelectedIndex());
+                        tableView.getItems().clear();
+                        for (Player player : team.getPlayers())
+                        {
+                            tableView.getItems().add(player);
+                        }
+                    }
+                    else
+                    {
+                        // TODO something here, error?
+                    }
+
+                    final Node source = (Node) e.getSource();
+                    final Stage stage = (Stage) source.getScene().getWindow();
+                    stage.close();
+                }
+        );
+
+        HBox row1 = new HBox(25, labelTeam, comboTeams);
+        HBox row2 = new HBox(25, buttonCreate, buttonCancel);
+        VBox temp = new VBox(25, row1, row2);
+        temp.setPadding(new Insets(50, 20, 20, 20));
+
+        return new StackPane(temp);
     }
 
 }
+
+// 183

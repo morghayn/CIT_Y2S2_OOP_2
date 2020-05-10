@@ -2,6 +2,9 @@ package View;
 
 import Controller.Controller;
 import Model.POJO.Manager;
+import Model.POJO.Name;
+import Model.POJO.Person;
+import Model.POJO.Team;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.scene.Group;
@@ -24,7 +27,6 @@ public class Managers
 
     private Controller controller;
     private TableView<Manager> tableView;
-    private VBox mainColumn;
 
     public Managers(Controller controller)
     {
@@ -32,6 +34,17 @@ public class Managers
     }
 
     public StackPane setup()
+    {
+        String[] columns = {"firstName", "middleName", "lastName", "phone", "email", "starRating", "dateOfBirth"};
+        prepareTableView(columns);
+
+        VBox mainColumn = new VBox(25, prepareButtonBar(), tableView);
+        mainColumn.setPadding(new Insets(35, 20, 20, 20));
+
+        return new StackPane(mainColumn);
+    }
+
+    private HBox prepareButtonBar()
     {
         Button create = new Button("Create");
         Button list = new Button("List");
@@ -47,45 +60,56 @@ public class Managers
         list.setOnAction(e -> list());
         update.setOnAction(e -> update());
         delete.setOnAction(e -> delete());
-        HBox buttons = new HBox(50, create, list, update, delete);
+        return new HBox(50, create, list, update, delete);
+    }
 
-
+    public void prepareTableView(String[] columns)
+    {
         tableView = new TableView<>();
-        TableColumn<Manager, String> column1, column2, column3, column4, column5, column6, column7;
-        column1 = new TableColumn<>("firstName");
-        column2 = new TableColumn<>("middleName");
-        column3 = new TableColumn<>("lastName");
-        column4 = new TableColumn<>("phone");
-        column5 = new TableColumn<>("email");
-        column6 = new TableColumn<>("starRating");
-        column7 = new TableColumn<>("dateOfBirth");
-        column1.setCellValueFactory(new PropertyValueFactory<>("firstName"));
-        column2.setCellValueFactory(new PropertyValueFactory<>("middleName"));
-        column3.setCellValueFactory(new PropertyValueFactory<>("lastName"));
-        column4.setCellValueFactory(new PropertyValueFactory<>("phone"));
-        column5.setCellValueFactory(new PropertyValueFactory<>("email"));
-        column6.setCellValueFactory(new PropertyValueFactory<>("starRating"));
-        column7.setCellValueFactory(new PropertyValueFactory<>("dateOfBirth"));
-        tableView.getColumns().add(column1);
-        tableView.getColumns().add(column2);
-        tableView.getColumns().add(column3);
-        tableView.getColumns().add(column4);
-        tableView.getColumns().add(column5);
-        tableView.getColumns().add(column6);
-        tableView.getColumns().add(column7);
-        column1.prefWidthProperty().bind(tableView.widthProperty().divide(7));
-        column2.prefWidthProperty().bind(tableView.widthProperty().divide(7));
-        column3.prefWidthProperty().bind(tableView.widthProperty().divide(7));
-        column4.prefWidthProperty().bind(tableView.widthProperty().divide(7));
-        column5.prefWidthProperty().bind(tableView.widthProperty().divide(7));
-        column6.prefWidthProperty().bind(tableView.widthProperty().divide(7));
-        column7.prefWidthProperty().bind(tableView.widthProperty().divide(7));
+
+        for (String columnName : columns)
+        {
+            TableColumn<Manager, String> column = new TableColumn<>(columnName);
+            column.setCellValueFactory(new PropertyValueFactory<>(columnName));
+            tableView.getColumns().add(column);
+            column.prefWidthProperty().bind(tableView.widthProperty().divide(columns.length));
+        }
         tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+    }
 
+    public void list()
+    {
+        List<Manager> managers = controller.getManagers();
+        tableView.getItems().clear();
+        for (Manager manager : managers)
+        {
+            tableView.getItems().add(manager);
+        }
+    }
 
-        VBox mainColumn = new VBox(50, buttons, tableView);
-        mainColumn.setPadding(new Insets(50, 20, 20, 20));
-        return new StackPane(mainColumn);
+    public void update()
+    {
+
+    }
+
+    public void delete()
+    {
+        if (tableView.getSelectionModel().getSelectedIndex() != -1)
+        {
+            Manager manager = tableView.getSelectionModel().getSelectedItem();
+            Team team = manager.getTeam();
+            if (team != null)
+            {
+                team.removeManager(manager);
+                controller.updateTeam(team);
+            }
+            controller.deleteManager(manager);
+            list();
+        }
+        else
+        {
+            new PopupWindow("Removal Error", "No valid table selection.");
+        }
     }
 
     public void create(ActionEvent e)
@@ -113,8 +137,9 @@ public class Managers
         TextField fieldLastName = new TextField();
         TextField fieldPhone = new TextField();
         TextField fieldEmail = new TextField();
-        TextField fieldDateOfBirth = new TextField();
         TextField fieldStarRating = new TextField();
+        TextField fieldDateOfBirth = new TextField();
+        ComboBox<String> comboTeams = new ComboBox<>();
         // TODO set text formatter for the fields
         //fieldWeek.setTextFormatter(new TextFormatter<>(allowNumbers(false)));
         //fieldPoints.setTextFormatter(new TextFormatter<>(allowNumbers(true)));
@@ -124,15 +149,23 @@ public class Managers
         Label labelLastName = new Label("Last Name");
         Label labelPhone = new Label("Phone");
         Label labelEmail = new Label("Email");
-        Label labelDateOfBirth = new Label("Date of Birth");
         Label labelStarRating = new Label("Star Rating");
+        Label labelDateOfBirth = new Label("Date of Birth");
+        Label labelTeams = new Label("Select Team");
         AppTheme.set(labelFirstName);
         AppTheme.set(labelMiddleName);
         AppTheme.set(labelLastName);
         AppTheme.set(labelPhone);
         AppTheme.set(labelEmail);
-        AppTheme.set(labelDateOfBirth);
         AppTheme.set(labelStarRating);
+        AppTheme.set(labelDateOfBirth);
+        AppTheme.set(labelTeams);
+
+        List<Team> teams = controller.getTeams();
+        for (Team team : teams)
+        {
+            comboTeams.getItems().add(team.getName());
+        }
 
         // :: instantiating and styling new buttons
         Button buttonCreate = new Button("Create");
@@ -140,36 +173,35 @@ public class Managers
         AppTheme.set(buttonCreate);
         AppTheme.set(buttonCancel);
 
-        buttonCreate.setOnAction(e ->
-                                 {
-                                     controller.persistManager
-                                             (
-                                                     controller.createManager
-                                                             (
-                                                                     controller.createPerson
-                                                                             (
-                                                                                     controller.createName
-                                                                                             (
-                                                                                                     fieldFirstName.getText(),
-                                                                                                     fieldMiddleName.getText(),
-                                                                                                     fieldLastName.getText()
-                                                                                             ),
-                                                                                     fieldEmail.getText(),
-                                                                                     fieldPhone.getText()
-                                                                             ),
-                                                                     fieldDateOfBirth.getText(),
-                                                                     parseInt(fieldStarRating.getText())
-                                                             )
-                                             );
-                                     final Node source = (Node) e.getSource();
-                                     final Stage stage = (Stage) source.getScene().getWindow();
-                                     stage.close();
-                                 }
-            );
+        buttonCreate.setOnAction(
+                e ->
+                {
+                    Name name = controller.createName(fieldFirstName.getText(), fieldMiddleName.getText(), fieldLastName.getText());
+                    Person person = controller.createPerson(name, fieldEmail.getText(), fieldPhone.getText());
+                    Manager manager = controller.createManager(person, fieldDateOfBirth.getText(), parseInt(fieldStarRating.getText()));
+
+                    if (comboTeams.getSelectionModel().getSelectedIndex() != -1)
+                    {
+                        Team selectedTeam = teams.get(comboTeams.getSelectionModel().getSelectedIndex());
+                        manager.setTeam(selectedTeam);
+                        selectedTeam.setManager(manager);
+                        controller.persistManager(manager);
+                        controller.updateTeam(selectedTeam);
+                    }
+                    else
+                    {
+                        controller.persistManager(manager);
+                    }
+
+                    final Node source = (Node) e.getSource();
+                    final Stage stage = (Stage) source.getScene().getWindow();
+                    stage.close();
+                }
+        );
 
         HBox row1 = new HBox(25, labelFirstName, fieldFirstName, labelMiddleName, fieldMiddleName, labelLastName, fieldLastName);
-        HBox row2 = new HBox(25, labelPhone, fieldPhone, labelEmail, fieldEmail);
-        HBox row3 = new HBox(25, labelDateOfBirth, fieldDateOfBirth, labelStarRating, fieldStarRating);
+        HBox row2 = new HBox(25, labelPhone, fieldPhone, labelEmail, fieldEmail, labelStarRating, fieldStarRating);
+        HBox row3 = new HBox(25, labelDateOfBirth, fieldDateOfBirth, labelTeams, comboTeams);
         HBox row4 = new HBox(25, buttonCreate, buttonCancel);
         VBox temp = new VBox(25, row1, row2, row3, row4);
         temp.setPadding(new Insets(50, 20, 20, 20));
@@ -177,33 +209,6 @@ public class Managers
         return new StackPane(temp);
     }
 
-    public void list()
-    {
-        List<Manager> managers = controller.getManagers();
-        tableView.getItems().clear();
-        for (Manager manager : managers)
-        {
-            tableView.getItems().add(manager);
-        }
-    }
-
-    public void update()
-    {
-
-    }
-
-    public void delete()
-    {
-        if (tableView.getSelectionModel().getSelectedIndex() != -1)
-        {
-            Manager manager = tableView.getSelectionModel().getSelectedItem();
-            controller.deleteManager(manager);
-            list();
-        }
-        else
-        {
-            new PopupWindow("Removal Error", "No valid table selection.");
-        }
-    }
-
 }
+
+// 222

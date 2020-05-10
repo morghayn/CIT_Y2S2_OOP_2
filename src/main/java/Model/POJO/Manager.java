@@ -15,7 +15,7 @@ public class Manager extends Person
     private String dateOfBirth;
     private int starRating;
 
-    @OneToOne(mappedBy = "manager")
+    @OneToOne(mappedBy = "manager")//, cascade = CascadeType.DETACH, fetch = FetchType.EAGER)
     private Team team;
 
     public Manager()
@@ -33,5 +33,15 @@ public class Manager extends Person
 
         setDateOfBirth(dateOfBirth);
         setStarRating(starRating);
+    }
+
+    public void setTeam(Team team)
+    {
+        if (this.team != null)
+        {
+            this.team = team;
+            team.setManager(this);
+            this.team.setManager(null);
+        }
     }
 }
