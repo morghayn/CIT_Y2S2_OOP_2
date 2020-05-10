@@ -161,6 +161,40 @@ public class PlayerDAO
         return players;
     }
 
+    public List<Player> searchName(String search)
+    {
+        EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
+        EntityTransaction et = null;
+        List<Player> players = null;
+
+        try
+        {
+            et = em.getTransaction();
+            et.begin();
+
+            String queryStr = "SELECT p FROM Player p WHERE concat(firstName, ' ', middleName, ' ', lastName) like :search";
+            TypedQuery<Player> query = em.createQuery(queryStr, Player.class);
+            query.setParameter("search", "%" + search + "%");
+            players = query.getResultList();
+
+            et.commit();
+        }
+        catch (Exception ex)
+        {
+            if (et != null)
+            {
+                et.rollback();
+            }
+            ex.printStackTrace();
+        }
+        finally
+        {
+            em.close();
+        }
+
+        return players;
+    }
+
 }
 
 /*

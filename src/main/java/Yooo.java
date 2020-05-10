@@ -16,6 +16,20 @@ public class Yooo
 
     public static void main(String[] args)
     {
+        PlayerDAO playerDAO = new PlayerDAO(ENTITY_MANAGER_FACTORY);
+
+        Name name = new Name("Pobby", "Jim", "Bob");
+        Player player = new Player();
+        player.setName(name);
+        player.setNumGoals(5);
+        player.setGoalie(false);
+        player.setEmail("morgan.nolan@hotmail.com + i");
+        playerDAO.persist(player);
+
+
+        playerDAO.likeName("Jim");
+
+        // SELECT p FROM Person WHERE CONCAT(p.firstName, ' ', p.lastName) LIKE :search
         //PlayerDAO playerDAO = new PlayerDAO(ENTITY_MANAGER_FACTORY);
 
        // Player player = playerDAO.find(2);
