@@ -85,6 +85,11 @@ public class Controller
         return playerDAO.searchName(searchPhrase);
     }
 
+    public List<Player> getTeamPlayers(Team team)
+    {
+        return team.getPlayers();
+    }
+
     // Update
     public void updateManager(Manager manager)
     {
@@ -103,17 +108,17 @@ public class Controller
 
     // DELETE
 
-    public void deleteManager(Manager manager)
+    public void delete(Manager manager)
     {
         managerDAO.remove(manager);
     }
 
-    public void deletePlayer(Player player)
+    public void delete(Player player)
     {
         playerDAO.remove(player);
     }
 
-    public void deleteTeam(Team team)
+    public void delete(Team team)
     {
         teamDAO.remove(team);
     }

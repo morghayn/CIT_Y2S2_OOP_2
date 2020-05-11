@@ -54,12 +54,12 @@ public class Yooo
         //getTeamPlayersDemo();
 
         Model.POJO.Team team = new Team();
-        team.setJerseyColour("Orange");
-        team.setName("JellyFish");
+        team.setJerseyColour("Apples");
+        team.setName("Fried");
 
         for(int i = 0; i < 15; i++)
         {
-            Name name = new Name("Jelly " + i, "Pants " + i, "Nolan " + i);
+            Name name = new Name("Peanuts " + i, "Pants " + i, "Nolan " + i);
             Player player = new Player();
             player.setName(name);
             player.setNumGoals(5);

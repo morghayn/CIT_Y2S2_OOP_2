@@ -26,14 +26,14 @@ import static java.lang.Integer.parseInt;
 public class FormPopup
 {
 
-    private Controller controller;
+    private final Controller controller;
 
     public FormPopup(Controller controller)
     {
         this.controller = controller;
     }
 
-    public void pop(ActionEvent e, StackPane form)
+    public void popup(ActionEvent e, StackPane form)
     {
         final Node source = (Node) e.getSource();
         final Stage stage = (Stage) source.getScene().getWindow();
@@ -55,9 +55,6 @@ public class FormPopup
         Map<String, TextField> fields = new HashMap<>();
         for(int i = 0; i < names.length; i++)
         {
-            // TODO set text formatter for the fields
-            //fieldWeek.setTextFormatter(new TextFormatter<>(allowNumbers(false)));
-            //fieldPoints.setTextFormatter(new TextFormatter<>(allowNumbers(true)));
             TextField temp = new TextField();
             if (fieldConstraints[i])
             {
@@ -123,20 +120,11 @@ public class FormPopup
     /**
      * <p>Returns a unary operator to format text boxes to only allow number input.</p>
      *
-     * @param negative_allowed indicates to the code whether a field may have negative integers
      * @return the unary operator that is generated, will either allow all whole integers, or just positive integers
      */
     private static UnaryOperator<TextFormatter.Change> allowNumbers()
     {
-        return change ->
-        {
-            String text = change.getControlNewText();
-            return (
-                    text.matches("([0-9]*)?")
-                    ? change
-                    : null
-            );
-        };
+        return change -> (change.getControlNewText().matches("([0-9]*)?") ? change : null);
     }
 
     public void closeThis(ActionEvent e)
@@ -145,4 +133,5 @@ public class FormPopup
         final Stage stage = (Stage) source.getScene().getWindow();
         stage.close();
     }
+
 }
