@@ -1,33 +1,29 @@
 package View;
 
 import Controller.Controller;
-import Model.POJO.Manager;
 import Model.POJO.Player;
 import Model.POJO.Team;
-import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
-import javafx.scene.Group;
-import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 
 import java.util.List;
+import java.util.Map;
 
 public class Players
 {
 
+    private FormPopup form;
     private Controller controller;
     private TableView<Player> tableView;
 
     public Players(Controller controller)
     {
         this.controller = controller;
+        form = new FormPopup(controller);
     }
 
     public StackPane setup()
@@ -35,10 +31,7 @@ public class Players
         String[] columns = {"firstName", "middleName", "lastName", "phone", "email", "numGoals", "goalie"};
         prepareTableView(columns);
 
-        Button viewTeamPlayers = new Button("Team Players");
-        viewTeamPlayers.setOnAction(this::teamPlayers);
-
-        VBox mainColumn = new VBox(25, prepareButtonBar(), prepareSearchBar(), viewTeamPlayers, tableView);
+        VBox mainColumn = new VBox(25, prepareButtonBar(), prepareSearchBar(), tableView);
         mainColumn.setPadding(new Insets(35, 20, 20, 20));
 
         return new StackPane(mainColumn);
@@ -61,26 +54,20 @@ public class Players
                          tableView.getItems().add(player);
                      }
                  });
-        return new HBox(50, labelSearch, fieldSearch, buttonSearch);
+
+        Button viewTeamPlayers = new Button("Team Players");
+        viewTeamPlayers.setOnAction(e -> form.pop(e, teamSelectLayout()));
+        return new HBox(50, labelSearch, fieldSearch, buttonSearch, viewTeamPlayers);
     }
 
     private HBox prepareButtonBar()
     {
-        Button create = new Button("Create");
-        Button list = new Button("List");
-        Button update = new Button("Update");
-        Button delete = new Button("Delete");
-
-        AppTheme.set(create);
-        AppTheme.set(list);
-        AppTheme.set(update);
-        AppTheme.set(delete);
-
-        create.setOnAction(this::create);
-        list.setOnAction(e -> list());
-        update.setOnAction(e -> update());
-        delete.setOnAction(e -> delete());
-        return new HBox(50, create, list, update, delete);
+        Map<String, Button> buttons = form.createButtonMap(new String[] {"Create", "List", "Update", "Delete"});
+        buttons.get("Create").setOnAction(e -> form.pop(e, playerLayout()));
+        buttons.get("List").setOnAction(e -> list());
+        buttons.get("Update").setOnAction(e -> update());
+        buttons.get("Delete").setOnAction(e -> delete());
+        return new HBox(50, buttons.get("Create"), buttons.get("List"), buttons.get("Update"), buttons.get("Delete"));
     }
 
     public void prepareTableView(String[] columns)
@@ -125,133 +112,104 @@ public class Players
         }
     }
 
-    public void create(ActionEvent e)
+    public StackPane playerLayout()
     {
-        final Node source = (Node) e.getSource();
-        final Stage stage = (Stage) source.getScene().getWindow();
-
-        Group root = new Group();
-        Stage dialog = new Stage();
-        Scene temp = new Scene(root, 920, 300);
-        dialog.setScene(temp);
-        root.getChildren().add(createPane());
-
-        dialog.centerOnScreen();
-
-        dialog.initOwner(stage);
-        dialog.initModality(Modality.APPLICATION_MODAL);
-        dialog.showAndWait();
-    }
-
-    public StackPane createPane()
-    {
-        TextField fieldFirstName = new TextField();
-        TextField fieldMiddleName = new TextField();
-        TextField fieldLastName = new TextField();
-        TextField fieldPhone = new TextField();
-        TextField fieldEmail = new TextField();
-        TextField fieldDateOfBirth = new TextField();
-        TextField fieldStarRating = new TextField();
-        // TODO set text formatter for the fields
-        //fieldWeek.setTextFormatter(new TextFormatter<>(allowNumbers(false)));
-        //fieldPoints.setTextFormatter(new TextFormatter<>(allowNumbers(true)));
-
-        Label labelFirstName = new Label("First Name");
-        Label labelMiddleName = new Label("Middle Name");
-        Label labelLastName = new Label("Last Name");
-        Label labelPhone = new Label("Phone");
-        Label labelEmail = new Label("Email");
-        Label labelDateOfBirth = new Label("Date of Birth");
-        Label labelStarRating = new Label("Star Rating");
-        AppTheme.set(labelFirstName);
-        AppTheme.set(labelMiddleName);
-        AppTheme.set(labelLastName);
-        AppTheme.set(labelPhone);
-        AppTheme.set(labelEmail);
-        AppTheme.set(labelDateOfBirth);
-        AppTheme.set(labelStarRating);
-
-        // :: instantiating and styling new buttons
-        Button buttonCreate = new Button("Create");
-        Button buttonCancel = new Button("Cancel");
-        AppTheme.set(buttonCreate);
-        AppTheme.set(buttonCancel);
-
-        HBox row1 = new HBox(25, labelFirstName, fieldFirstName, labelMiddleName, fieldMiddleName, labelLastName, fieldLastName);
-        HBox row2 = new HBox(25, labelPhone, fieldPhone, labelEmail, fieldEmail);
-        HBox row3 = new HBox(25, labelDateOfBirth, fieldDateOfBirth, labelStarRating, fieldStarRating);
-        VBox temp = new VBox(25, row1, row2, row3);
-        temp.setPadding(new Insets(50, 20, 20, 20));
-
-        return new StackPane(temp);
-    }
-
-    public void teamPlayers(ActionEvent e)
-    {
-        final Node source = (Node) e.getSource();
-        final Stage stage = (Stage) source.getScene().getWindow();
-
-        Group root = new Group();
-        Stage dialog = new Stage();
-        Scene temp = new Scene(root, 920, 300);
-        dialog.setScene(temp);
-        root.getChildren().add(teamPlayersPane());
-
-        dialog.centerOnScreen();
-
-        dialog.initOwner(stage);
-        dialog.initModality(Modality.APPLICATION_MODAL);
-        dialog.showAndWait();
-    }
-
-    public StackPane teamPlayersPane()
-    {
-        Label labelTeam  = new Label("Select Team");
+        String[] names = {"First Name", "Middle Name", "Last Name", "Phone", "Email", "Goal Number", "Goalie"};
+        boolean[] fieldConstraints = {false, false, false, true, false, true, false};
+        Map<String, Label> labels = form.createLabelMap(names);
+        Map<String, TextField> fields = form.createFieldMap(names, fieldConstraints);
+        Map<String, Button> buttons = form.createButtonMap(new String[]{"Create", "Cancel"});
         ComboBox<String> comboTeams = new ComboBox<>();
+        Label labelTeams = new Label("Select Team");
         List<Team> teams = controller.getTeams();
+        AppTheme.set(labelTeams);
 
         for (Team team : teams)
         {
             comboTeams.getItems().add(team.getName());
         }
 
-        // :: instantiating and styling new buttons
-        Button buttonCreate = new Button("Create");
-        Button buttonCancel = new Button("Cancel");
-        AppTheme.set(buttonCreate);
-        AppTheme.set(buttonCancel);
+        buttons.get("Cancel").setOnAction(e -> form.closeThis(e));
+        buttons.get("Create").setOnAction
+                (e ->
+                 {
+                     submitForm(
+                             fields,
+                             (
+                                     comboTeams.getSelectionModel().getSelectedIndex() != -1 ?
+                                     teams.get(comboTeams.getSelectionModel().getSelectedIndex()) : null
+                             )
+                     );
+                     form.closeThis(e);
+                 });
 
-        buttonCreate.setOnAction(
-                e ->
-                {
-                    if (comboTeams.getSelectionModel().getSelectedIndex() != -1)
-                    {
-                        Team team = teams.get(comboTeams.getSelectionModel().getSelectedIndex());
-                        tableView.getItems().clear();
-                        for (Player player : team.getPlayers())
-                        {
-                            tableView.getItems().add(player);
-                        }
-                    }
-                    else
-                    {
-                        // TODO something here, error?
-                    }
 
-                    final Node source = (Node) e.getSource();
-                    final Stage stage = (Stage) source.getScene().getWindow();
-                    stage.close();
-                }
-        );
+        HBox[] rows = {new HBox(25), new HBox(25), new HBox(25), new HBox(25)};
+        for (int i = 0; i < names.length; i++)
+        {
+            rows[i / 3].getChildren().addAll(labels.get(names[i]), fields.get(names[i]));
+        }
 
-        HBox row1 = new HBox(25, labelTeam, comboTeams);
-        HBox row2 = new HBox(25, buttonCreate, buttonCancel);
-        VBox temp = new VBox(25, row1, row2);
+        rows[2].getChildren().addAll(labelTeams, comboTeams);
+        rows[3].getChildren().addAll(buttons.get("Create"), buttons.get("Cancel"));
+
+        VBox temp = new VBox(25, rows[0], rows[1], rows[2], rows[3]);
         temp.setPadding(new Insets(50, 20, 20, 20));
-
         return new StackPane(temp);
     }
 
-}
+    private StackPane teamSelectLayout()
+    {
+        Map<String, Button> buttons = form.createButtonMap(new String[]{"Select", "Cancel"});
+        ComboBox<String> comboTeams = new ComboBox<>();
+        Label labelTeams = new Label("Select Team");
+        List<Team> teams = controller.getTeams();
+        AppTheme.set(labelTeams);
 
-// 183
+        for (Team team : teams)
+        {
+            comboTeams.getItems().add(team.getName());
+        }
+
+        buttons.get("Cancel").setOnAction(e -> form.closeThis(e));
+        buttons.get("Select").setOnAction
+                (e ->
+                 {
+                     if (comboTeams.getSelectionModel().getSelectedIndex() != -1)
+                     {
+                         Team team = teams.get(comboTeams.getSelectionModel().getSelectedIndex());
+                         tableView.getItems().clear();
+                         for (Player player : team.getPlayers())
+                         {
+                             tableView.getItems().add(player);
+                         }
+                     }
+                     // else TODO something here, error?
+                     form.closeThis(e);
+                 });
+
+        HBox[] rows = {new HBox(25), new HBox(25)};
+        rows[0].getChildren().addAll(labelTeams, comboTeams);
+        rows[1].getChildren().addAll(buttons.get("Select"), buttons.get("Cancel"));
+
+        VBox temp = new VBox(25, rows[0], rows[1]);
+        temp.setPadding(new Insets(50, 20, 20, 20));
+        return new StackPane(temp);
+    }
+
+    public void submitForm(Map<String, TextField> fields, Team team)
+    {
+        Player player =
+                form.createPlayer(
+                        fields,
+                        form.createPerson(
+                                fields,
+                                form.createName(fields)
+                        )
+                );
+
+        controller.persistPlayer(player);
+    }
+
+}
+// 259 -> 223 -> 214

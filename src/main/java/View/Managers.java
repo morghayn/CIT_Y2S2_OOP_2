@@ -2,35 +2,28 @@ package View;
 
 import Controller.Controller;
 import Model.POJO.Manager;
-import Model.POJO.Name;
-import Model.POJO.Person;
 import Model.POJO.Team;
-import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
-import javafx.scene.Group;
-import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 
 import java.util.List;
-
-import static java.lang.Integer.parseInt;
+import java.util.Map;
 
 public class Managers
 {
 
+    private FormPopup form;
     private Controller controller;
     private TableView<Manager> tableView;
 
     public Managers(Controller controller)
     {
         this.controller = controller;
+        form = new FormPopup(controller);
     }
 
     public StackPane setup()
@@ -46,27 +39,17 @@ public class Managers
 
     private HBox prepareButtonBar()
     {
-        Button create = new Button("Create");
-        Button list = new Button("List");
-        Button update = new Button("Update");
-        Button delete = new Button("Delete");
-
-        AppTheme.set(create);
-        AppTheme.set(list);
-        AppTheme.set(update);
-        AppTheme.set(delete);
-
-        create.setOnAction(this::create);
-        list.setOnAction(e -> list());
-        update.setOnAction(e -> update());
-        delete.setOnAction(e -> delete());
-        return new HBox(50, create, list, update, delete);
+        Map<String, Button> buttons = form.createButtonMap(new String[] {"Create", "List", "Update", "Delete"});
+        buttons.get("Create").setOnAction(e -> form.pop(e, managerLayout()));
+        buttons.get("List").setOnAction(e -> list());
+        buttons.get("Update").setOnAction(e -> update());
+        buttons.get("Delete").setOnAction(e -> delete());
+        return new HBox(50, buttons.get("Create"), buttons.get("List"), buttons.get("Update"), buttons.get("Delete"));
     }
 
     public void prepareTableView(String[] columns)
     {
         tableView = new TableView<>();
-
         for (String columnName : columns)
         {
             TableColumn<Manager, String> column = new TableColumn<>(columnName);
@@ -112,103 +95,72 @@ public class Managers
         }
     }
 
-    public void create(ActionEvent e)
+    public StackPane managerLayout()
     {
-        final Node source = (Node) e.getSource();
-        final Stage stage = (Stage) source.getScene().getWindow();
-
-        Group root = new Group();
-        Stage dialog = new Stage();
-        Scene temp = new Scene(root, 920, 280);
-        dialog.setScene(temp);
-        root.getChildren().add(createPane());
-
-        dialog.centerOnScreen();
-
-        dialog.initOwner(stage);
-        dialog.initModality(Modality.APPLICATION_MODAL);
-        dialog.showAndWait();
-    }
-
-    public StackPane createPane()
-    {
-        TextField fieldFirstName = new TextField();
-        TextField fieldMiddleName = new TextField();
-        TextField fieldLastName = new TextField();
-        TextField fieldPhone = new TextField();
-        TextField fieldEmail = new TextField();
-        TextField fieldStarRating = new TextField();
-        TextField fieldDateOfBirth = new TextField();
+        String[] names = {"First Name", "Middle Name", "Last Name", "Phone", "Email", "Star Rating", "Date of Birth"};
+        boolean[] fieldConstraints = {false, false, false, true, false, true, false};
+        Map<String, Label> labels = form.createLabelMap(names);
+        Map<String, TextField> fields = form.createFieldMap(names, fieldConstraints);
+        Map<String, Button> buttons = form.createButtonMap(new String[] {"Create", "Cancel"});
         ComboBox<String> comboTeams = new ComboBox<>();
-        // TODO set text formatter for the fields
-        //fieldWeek.setTextFormatter(new TextFormatter<>(allowNumbers(false)));
-        //fieldPoints.setTextFormatter(new TextFormatter<>(allowNumbers(true)));
-
-        Label labelFirstName = new Label("First Name");
-        Label labelMiddleName = new Label("Middle Name");
-        Label labelLastName = new Label("Last Name");
-        Label labelPhone = new Label("Phone");
-        Label labelEmail = new Label("Email");
-        Label labelStarRating = new Label("Star Rating");
-        Label labelDateOfBirth = new Label("Date of Birth");
         Label labelTeams = new Label("Select Team");
-        AppTheme.set(labelFirstName);
-        AppTheme.set(labelMiddleName);
-        AppTheme.set(labelLastName);
-        AppTheme.set(labelPhone);
-        AppTheme.set(labelEmail);
-        AppTheme.set(labelStarRating);
-        AppTheme.set(labelDateOfBirth);
+        List<Team> teams = controller.getTeams();
         AppTheme.set(labelTeams);
 
-        List<Team> teams = controller.getTeams();
         for (Team team : teams)
         {
             comboTeams.getItems().add(team.getName());
         }
 
-        // :: instantiating and styling new buttons
-        Button buttonCreate = new Button("Create");
-        Button buttonCancel = new Button("Cancel");
-        AppTheme.set(buttonCreate);
-        AppTheme.set(buttonCancel);
+        buttons.get("Cancel").setOnAction(e -> form.closeThis(e));
+        buttons.get("Create").setOnAction
+                (e -> {
+                    submitForm(fields,
+                               (
+                                       comboTeams.getSelectionModel().getSelectedIndex() != -1 ?
+                                       teams.get(comboTeams.getSelectionModel().getSelectedIndex()) : null
+                               )
+                    );
+                    form.closeThis(e);
+                });
 
-        buttonCreate.setOnAction(
-                e ->
-                {
-                    Name name = controller.createName(fieldFirstName.getText(), fieldMiddleName.getText(), fieldLastName.getText());
-                    Person person = controller.createPerson(name, fieldEmail.getText(), fieldPhone.getText());
-                    Manager manager = controller.createManager(person, fieldDateOfBirth.getText(), parseInt(fieldStarRating.getText()));
 
-                    if (comboTeams.getSelectionModel().getSelectedIndex() != -1)
-                    {
-                        Team selectedTeam = teams.get(comboTeams.getSelectionModel().getSelectedIndex());
-                        manager.setTeam(selectedTeam);
-                        selectedTeam.setManager(manager);
-                        controller.persistManager(manager);
-                        controller.updateTeam(selectedTeam);
-                    }
-                    else
-                    {
-                        controller.persistManager(manager);
-                    }
+        HBox[] rows = {new HBox(25), new HBox(25), new HBox(25), new HBox(25)};
+        for (int i = 0; i < names.length; i++)
+        {
+            rows[i / 3].getChildren().addAll(labels.get(names[i]), fields.get(names[i]));
+        }
 
-                    final Node source = (Node) e.getSource();
-                    final Stage stage = (Stage) source.getScene().getWindow();
-                    stage.close();
-                }
-        );
-
-        HBox row1 = new HBox(25, labelFirstName, fieldFirstName, labelMiddleName, fieldMiddleName, labelLastName, fieldLastName);
-        HBox row2 = new HBox(25, labelPhone, fieldPhone, labelEmail, fieldEmail, labelStarRating, fieldStarRating);
-        HBox row3 = new HBox(25, labelDateOfBirth, fieldDateOfBirth, labelTeams, comboTeams);
-        HBox row4 = new HBox(25, buttonCreate, buttonCancel);
-        VBox temp = new VBox(25, row1, row2, row3, row4);
+        rows[2].getChildren().addAll(labelTeams, comboTeams);
+        rows[3].getChildren().addAll(buttons.get("Create"), buttons.get("Cancel"));
+        VBox temp = new VBox(25, rows[0], rows[1], rows[2], rows[3]);
         temp.setPadding(new Insets(50, 20, 20, 20));
 
         return new StackPane(temp);
     }
 
-}
+    public void submitForm(Map<String, TextField> fields, Team team)
+    {
+        Manager manager =
+                form.createManager(fields,
+                                   form.createPerson(fields,
+                                                     form.createName(fields)));
 
-// 222
+        controller.persistManager(manager);
+        /*
+        if (team != null) // TODO handling bi-direction is currently bad
+        {
+            manager.setTeam(team);
+            team.setManager(manager);
+            controller.persistManager(manager);
+            controller.updateTeam(team);
+        }
+        else
+        {
+            controller.persistManager(manager);
+        }
+        */
+    }
+
+}
+// 222 -> 175 -> 166

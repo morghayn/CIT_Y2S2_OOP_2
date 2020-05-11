@@ -16,18 +16,21 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.util.List;
+import java.util.Map;
 
 import static java.lang.Integer.parseInt;
 
 public class Teams
 {
 
+    private FormPopup form;
     private Controller controller;
     private TableView<Team> tableView;
 
     public Teams(Controller controller) // TODO pass controller instance through
     {
         this.controller = controller;
+        form = new FormPopup(controller);
     }
 
     public StackPane setup()
@@ -43,21 +46,12 @@ public class Teams
 
     private HBox prepareButtonBar()
     {
-        Button create = new Button("Create");
-        Button list = new Button("List");
-        Button update = new Button("Update");
-        Button delete = new Button("Delete");
-
-        AppTheme.set(create);
-        AppTheme.set(list);
-        AppTheme.set(update);
-        AppTheme.set(delete);
-
-        create.setOnAction(this::create);
-        list.setOnAction(e -> list());
-        update.setOnAction(e -> update());
-        delete.setOnAction(e -> delete());
-        return new HBox(50, create, list, update, delete);
+        Map<String, Button> buttons = form.createButtonMap(new String[] {"Create", "List", "Update", "Delete"});
+        buttons.get("Create").setOnAction(e -> form.pop(e, teamLayout()));
+        buttons.get("List").setOnAction(e -> list());
+        buttons.get("Update").setOnAction(e -> update());
+        buttons.get("Delete").setOnAction(e -> delete());
+        return new HBox(50, buttons.get("Create"), buttons.get("List"), buttons.get("Update"), buttons.get("Delete"));
     }
 
     public void prepareTableView(String[] columns)
@@ -102,82 +96,60 @@ public class Teams
         }
     }
 
-    public void create(ActionEvent e)
+    public StackPane teamLayout()
     {
-        final Node source = (Node) e.getSource();
-        final Stage stage = (Stage) source.getScene().getWindow();
-
-        Group root = new Group();
-        Stage dialog = new Stage();
-        Scene temp = new Scene(root, 920, 280);
-        dialog.setScene(temp);
-        root.getChildren().add(createPane());
-
-        dialog.centerOnScreen();
-
-        dialog.initOwner(stage);
-        dialog.initModality(Modality.APPLICATION_MODAL);
-        dialog.showAndWait();
-    }
-
-    public StackPane createPane()
-    {
-        TextField fieldTeamName = new TextField();
-        TextField fieldJerseyColour = new TextField();
+        String[] names = {"Team Name", "Jersey Colour", "Select Manager"};
+        boolean[] fieldConstraints = {false, false, false};
         ComboBox<String> comboManagers = new ComboBox<>();
-        // TODO set text formatter for the fields
-        //fieldWeek.setTextFormatter(new TextFormatter<>(allowNumbers(false)));
-        //fieldPoints.setTextFormatter(new TextFormatter<>(allowNumbers(true)));
-
-        Label labelTeamName = new Label("Team Name");
-        Label labelJerseyColour = new Label("Jersey Colour");
-        Label labelManager = new Label("Select Manager");
-        AppTheme.set(labelTeamName);
-        AppTheme.set(labelJerseyColour);
-        AppTheme.set(labelManager);
-
+        Map<String, TextField> fields = form.createFieldMap(names, fieldConstraints);
+        Map<String, Label> labels = form.createLabelMap(names);
+        Map<String, Button> buttons = form.createButtonMap(new String[] {"Create", "Cancel"});
         List<Manager> managers = controller.getManagers();
         for (Manager manager : managers)
         {
             comboManagers.getItems().add(manager.getFirstName() + " " + manager.getLastName());
         }
 
-        // :: instantiating and styling new buttons
-        Button buttonCreate = new Button("Create");
-        Button buttonCancel = new Button("Cancel");
-        AppTheme.set(buttonCreate);
-        AppTheme.set(buttonCancel);
-
-        buttonCreate.setOnAction(
+        buttons.get("Cancel").setOnAction(e -> form.closeThis(e));
+        buttons.get("Create").setOnAction(
                 e ->
                 {
-                    Team team = controller.createTeam(fieldTeamName.getText(), fieldJerseyColour.getText());
-
-                    if (comboManagers.getSelectionModel().getSelectedIndex() != -1)
-                    {
-                        Manager manager = managers.get(comboManagers.getSelectionModel().getSelectedIndex());
-                        team.setManager(manager);
-                        manager.setTeam(team);
-                        controller.persistTeam(team);
-                        controller.updateManager(manager);
-                    }
-                    else
-                    {
-                        controller.persistTeam(team);
-                    }
-
-                    final Node source = (Node) e.getSource();
-                    final Stage stage = (Stage) source.getScene().getWindow();
-                    stage.close();
+                    submitForm(fields, (comboManagers.getSelectionModel().getSelectedIndex() != -1 ? managers.get(comboManagers.getSelectionModel().getSelectedIndex()) : null));
+                    form.closeThis(e);
                 }
         );
 
-        HBox row1 = new HBox(25, labelTeamName, fieldTeamName, labelJerseyColour, fieldJerseyColour, labelManager, comboManagers);
-        HBox row2 = new HBox(25, buttonCreate, buttonCancel);
-        VBox temp = new VBox(25, row1, row2);
+        HBox[] rows = {new HBox(25), new HBox(25)};
+        for (int i = 0; i < 2; i++)
+        {
+            rows[0].getChildren().addAll(labels.get(names[i]), fields.get(names[i]));
+        }
+        rows[0].getChildren().addAll(labels.get("Select Manager"), comboManagers);
+        rows[1] = new HBox(25, buttons.get("Create"), buttons.get("Cancel"));
+        VBox temp = new VBox(25, rows[0], rows[1]);
         temp.setPadding(new Insets(50, 20, 20, 20));
 
         return new StackPane(temp);
     }
 
+    private void submitForm(Map<String, TextField> fields, Manager manager)
+    {
+        Team team = controller.createTeam(fields.get("Team Name").getText(), fields.get("Jersey Colour").getText());
+
+        /*
+        if (manager != null)
+        {
+            team.setManager(manager);
+            manager.setTeam(team);
+            controller.persistTeam(team);
+            controller.updateManager(manager);
+        }
+        else
+        {
+            controller.persistTeam(team);
+        }
+         */
+    }
+
 }
+// 184
