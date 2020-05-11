@@ -16,6 +16,7 @@ import java.util.Map;
 public class Players
 {
 
+    private Team team;
     private final FormPopup form;
     private final Controller controller;
     private TableView<Player> tableView;
@@ -37,7 +38,7 @@ public class Players
     public TableView<Player> buildTableView()
     {
         tableView = new TableView<>();
-        String[] columns = new String[] {"firstName", "middleName", "lastName", "phone", "email", "numGoals", "goalie"};
+        String[] columns = new String[]{"firstName", "middleName", "lastName", "phone", "email", "numGoals", "goalie"};
 
         for (String columnName : columns)
         {
@@ -59,7 +60,7 @@ public class Players
 
     public HBox buildButtonBar()
     {
-        Map<String, Button> buttons = form.createButtonMap(new String[] {"Create", "List", "Update", "Delete"});
+        Map<String, Button> buttons = form.createButtonMap(new String[]{"Create", "List", "Update", "Delete"});
 
         buttons.get("Create").setOnAction(e -> form.popup(e, playerLayout()));
         buttons.get("List").setOnAction(e -> populateTableView());
@@ -100,36 +101,25 @@ public class Players
         }
     }
 
-
-
     public StackPane playerLayout()
     {
         String[] names = {"First Name", "Middle Name", "Last Name", "Phone", "Email", "Goal Number", "Goalie"};
         boolean[] fieldConstraints = {false, false, false, true, false, true, false};
+
         Map<String, Label> labels = form.createLabelMap(names);
         Map<String, TextField> fields = form.createFieldMap(names, fieldConstraints);
-        Map<String, Button> buttons = form.createButtonMap(new String[]{"Create", "Cancel"});
+        Map<String, Button> buttons = form.createButtonMap(new String[]{"Create", "Cancel", "Select Team"});
         buttons.get("Cancel").setOnAction(form::closeThis);
-        HBox[] rows = {new HBox(25), new HBox(25), new HBox(25), new HBox(25)};
-        for (int i = 0; i < names.length; i++)
-        {
-            rows[i / 3].getChildren().addAll(labels.get(names[i]), fields.get(names[i]));
-        }
+        HBox[] rows = form.createHBoxes(4);
+        form.binGUIComponents(names, rows, labels, fields);
 
-        ComboBox<String> comboTeams = new ComboBox<>();
-        Label labelTeams = new Label("Select Team");
-        AppTheme.set(labelTeams);
-        controller.getTeams().forEach(t -> comboTeams.getItems().add(t.getName()));
-
-        /*
         buttons.get("Create").setOnAction(e -> {
-            int index = comboTeams.getSelectionModel().getSelectedIndex();
-            submitForm(fields, (index != -1 ? teams.get(index) : null));
+            // todo Create / Submit
             form.closeThis(e);
         });
-         */
 
-        rows[2].getChildren().addAll(labelTeams, comboTeams);
+        buttons.get("Select Team").setOnAction(e -> form.popup(e, selectTeam()));
+        rows[2].getChildren().addAll(buttons.get("Select Team"));
         rows[3].getChildren().addAll(buttons.get("Create"), buttons.get("Cancel"));
 
         VBox temp = new VBox(25, rows[0], rows[1], rows[2], rows[3]);
@@ -137,72 +127,28 @@ public class Players
         return new StackPane(temp);
     }
 
-    public StackPane managerLayout()
+    public StackPane selectTeam()
     {
-        String[] names = {"First Name", "Middle Name", "Last Name", "Phone", "Email", "Star Rating", "Date of Birth"};
-        boolean[] fieldConstraints = {false, false, false, true, false, true, false};
-
-
-        Map<String, Label> labels = form.createLabelMap(names);
-        Map<String, TextField> fields = form.createFieldMap(names, fieldConstraints);
-        Map<String, Button> buttons = form.createButtonMap(new String[]{"Create", "Cancel"});
-        buttons.get("Cancel").setOnAction(form::closeThis);
-        HBox[] rows = {new HBox(25), new HBox(25), new HBox(25), new HBox(25)};
-        for (int i = 0; i < names.length; i++)
-        {
-            rows[i / 3].getChildren().addAll(labels.get(names[i]), fields.get(names[i]));
-        }
-
-        ComboBox<String> comboTeams = new ComboBox<>();
+        team = null;
         Label labelTeams = new Label("Select Team");
+        ComboBox<String> comboTeams = new ComboBox<>();
         AppTheme.set(labelTeams);
-        controller.getTeams().forEach(t -> comboTeams.getItems().add(t.getName()));
 
-        /*
-        buttons.get("Create").setOnAction(e -> {
-            int index = comboTeams.getSelectionModel().getSelectedIndex();
-            submitForm(fields, (index != -1 ? teams.get(index) : null));
-            form.closeThis(e);
-        });
-        */
+        List<Team> teams = controller.getTeams();
+        teams.forEach(t -> comboTeams.getItems().add(t.getName()));
 
-        rows[2].getChildren().addAll(labelTeams, comboTeams);
-        rows[3].getChildren().addAll(buttons.get("Create"), buttons.get("Cancel"));
-
-        VBox temp = new VBox(25, rows[0], rows[1], rows[2], rows[3]);
-        temp.setPadding(new Insets(50, 20, 20, 20));
-        return new StackPane(temp);
-    }
-
-    public StackPane teamLayout()
-    {
-        String[] names = {"Team Name", "Jersey Colour", "Select Manager"};
-        boolean[] fieldConstraints = {false, false, false};
-
-
-        Map<String, TextField> fields = form.createFieldMap(names, fieldConstraints);
-        Map<String, Label> labels = form.createLabelMap(names);
-        Map<String, Button> buttons = form.createButtonMap(new String[] {"Create", "Cancel"});
+        Map<String, Button> buttons = form.createButtonMap(new String[]{"Select", "Cancel"});
         buttons.get("Cancel").setOnAction(form::closeThis);
-        HBox[] rows = {new HBox(25), new HBox(25)};
-        rows[0].getChildren().addAll(labels.get(names[0]), fields.get(names[0]));
-        rows[0].getChildren().addAll(labels.get(names[1]), fields.get(names[1]));
-
-        ComboBox<String> comboManagers = new ComboBox<>();
-        controller.getManagers().forEach(m -> comboManagers.getItems().add(m.getFirstName() + " " + m.getLastName()));
-
-        /*
-        buttons.get("Create").setOnAction(e -> {
-            int index = comboManagers.getSelectionModel().getSelectedIndex();
-            submitForm(fields, (index != -1 ? managers.get(index) : null));
+        buttons.get("Select").setOnAction(e -> {
+            int index = comboTeams.getSelectionModel().getSelectedIndex();
+            if (index != -1)
+            {
+                team = teams.get(index);
+            }
             form.closeThis(e);
         });
-        */
 
-        rows[0].getChildren().addAll(labels.get("Select Manager"), comboManagers);
-        rows[1] = new HBox(25, buttons.get("Create"), buttons.get("Cancel"));
-
-        VBox temp = new VBox(25, rows[0], rows[1]);
+        VBox temp = new VBox(25, new HBox(50, labelTeams, comboTeams), new HBox(50, buttons.get("Select"), buttons.get("Cancel")));
         temp.setPadding(new Insets(50, 20, 20, 20));
         return new StackPane(temp);
     }

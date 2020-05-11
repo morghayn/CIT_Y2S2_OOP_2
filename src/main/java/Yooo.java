@@ -54,12 +54,12 @@ public class Yooo
         //getTeamPlayersDemo();
 
         Model.POJO.Team team = new Team();
-        team.setJerseyColour("Apples");
-        team.setName("Fried");
+        team.setJerseyColour("Blue");
+        team.setName("Team Rick and Morty");
 
         for(int i = 0; i < 15; i++)
         {
-            Name name = new Name("Peanuts " + i, "Pants " + i, "Nolan " + i);
+            Name name = new Name("Rick " + i, "" + i, "Sanchez " + i);
             Player player = new Player();
             player.setName(name);
             player.setNumGoals(5);

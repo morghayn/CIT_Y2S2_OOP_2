@@ -1,18 +1,13 @@
 package View;
 
 import Controller.Controller;
-import Model.POJO.Manager;
-import Model.POJO.Name;
-import Model.POJO.Person;
-import Model.POJO.Player;
+import Model.POJO.*;
 import javafx.event.ActionEvent;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextFormatter;
+import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -132,6 +127,26 @@ public class FormPopup
         final Node source = (Node) e.getSource();
         final Stage stage = (Stage) source.getScene().getWindow();
         stage.close();
+    }
+
+    public HBox[] createHBoxes(int amount)
+    {
+        HBox[] temp = new HBox[amount];
+
+        for (int i = 0; i < amount; i++)
+        {
+            temp[i] = new HBox(25);
+        }
+
+        return temp;
+    }
+
+    public void binGUIComponents(String[] names, HBox[] rows, Map<String, Label> labels, Map<String, TextField> fields)
+    {
+        for (int i = 0; i < names.length; i++)
+        {
+            rows[i / 3].getChildren().addAll(labels.get(names[i]), fields.get(names[i]));
+        }
     }
 
 }
