@@ -40,6 +40,52 @@ public class Managers
         return new StackPane(temp);
     }
 
+    public HBox buildButtonBar()
+    {
+        Map<String, Button> buttons = form.createButtonMap(new String[]{"Create", "List", "Update", "Delete"});
+
+        buttons.get("Create").setOnAction(e -> form.popup(e, managerLayout(true)));
+        buttons.get("List").setOnAction(e -> populateTableView());
+        buttons.get("Update").setOnAction(this::update);
+        buttons.get("Delete").setOnAction(e -> delete());
+
+        return new HBox(100, buttons.get("Create"), buttons.get("List"), buttons.get("Update"), buttons.get("Delete"));
+    }
+
+    public void update(ActionEvent e)
+    {
+        if (tableView.getSelectionModel().getSelectedIndex() != -1)
+        {
+            manager = tableView.getSelectionModel().getSelectedItem();
+            StackPane temp = managerLayout(false);
+            fields.get("First Name").setText(manager.getFirstName());
+            fields.get("Middle Name").setText(manager.getMiddleName());
+            fields.get("Last Name").setText(manager.getLastName());
+            fields.get("Phone").setText(manager.getPhone());
+            fields.get("Email").setText(manager.getEmail());
+            //fields.get("Star Rating").setText(manager.getStarRating());
+            //fields.get("Date of Birth").setText(manager.getStarRating());
+            form.popup(e, temp);
+        }
+        else
+        {
+            new PopupWindow("Update Error", "No valid table selection.");
+        }
+    }
+
+    public void delete()
+    {
+        if (tableView.getSelectionModel().getSelectedIndex() != -1)
+        {
+            controller.delete(tableView.getSelectionModel().getSelectedItem());
+            populateTableView();
+        }
+        else
+        {
+            new PopupWindow("Removal Error", "No valid table selection.");
+        }
+    }
+
     public TableView<Manager> buildTableView()
     {
         tableView = new TableView<>();
@@ -63,54 +109,6 @@ public class Managers
         tableView.getItems().addAll(controller.getManagers());
     }
 
-    public HBox buildButtonBar()
-    {
-        Map<String, Button> buttons = form.createButtonMap(new String[]{"Create", "List", "Update", "Delete"});
-
-        buttons.get("Create").setOnAction(e -> form.popup(e, managerLayout(true)));
-        buttons.get("List").setOnAction(e -> populateTableView());
-        buttons.get("Update").setOnAction(this::update);
-        buttons.get("Delete").setOnAction(e -> delete());
-
-        return new HBox(100, buttons.get("Create"), buttons.get("List"), buttons.get("Update"), buttons.get("Delete"));
-    }
-
-    public void delete()
-    {
-        if (tableView.getSelectionModel().getSelectedIndex() != -1)
-        {
-            controller.delete(tableView.getSelectionModel().getSelectedItem());
-            populateTableView();
-        }
-        else
-        {
-            new PopupWindow("Removal Error", "No valid table selection.");
-        }
-    }
-
-    public void update(ActionEvent e)
-    {
-        team = null;
-
-        if (tableView.getSelectionModel().getSelectedIndex() != -1)
-        {
-            Manager manager = tableView.getSelectionModel().getSelectedItem();
-            StackPane temp = managerLayout(false);
-            fields.get("First Name").setText(manager.getFirstName());
-            fields.get("Middle Name").setText(manager.getMiddleName());
-            fields.get("Last Name").setText(manager.getLastName());
-            fields.get("Phone").setText(manager.getPhone());
-            fields.get("Email").setText(manager.getEmail());
-            //fields.get("Star Rating").setText(manager.getStarRating());
-            //fields.get("Date of Birth").setText(manager.getStarRating());
-            form.popup(e, temp);
-        }
-        else
-        {
-            new PopupWindow("Update Error", "No valid table selection.");
-        }
-    }
-
     public StackPane managerLayout(boolean isCreate)
     {
         team = null;
@@ -123,7 +121,7 @@ public class Managers
         buttons.get("Cancel").setOnAction(form::closeThis);
         HBox[] rows = form.createHBoxes(4);
         form.binGUIComponents(names, rows, labels, fields);
-        buttons.get((isCreate ? "Create" : "Update")).setOnAction(this::submitForm);
+        buttons.get((isCreate ? "Create" : "Update")).setOnAction(isCreate? this::submitForm : this::submitUpdate);
 
         buttons.get("Select Team").setOnAction(e -> form.popup(e, selectTeam()));
         rows[2].getChildren().addAll(buttons.get("Select Team"));
@@ -150,6 +148,7 @@ public class Managers
     {
         Manager manager = form.createManager(fields, form.createPerson(fields, form.createName(fields)));
         manager.setPersonID(this.manager.getPersonID());
+        manager.setTeam(this.manager.getTeam());
         this.manager = manager;
         controller.updateManager(this.manager);
 

@@ -54,7 +54,7 @@ public class ManagerDAO
             et = em.getTransaction();
             et.begin();
 
-            em.remove(manager);
+            em.merge(manager);
             et.commit();
         }
         catch (Exception ex)

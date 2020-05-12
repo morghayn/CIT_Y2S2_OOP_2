@@ -59,12 +59,6 @@ public class Teams
         return tableView;
     }
 
-    public void populateTableView()
-    {
-        tableView.getItems().clear();
-        tableView.getItems().addAll(controller.getTeams());
-    }
-
     public HBox buildButtonBar()
     {
         Map<String, Button> buttons = form.createButtonMap(new String[] {"Create", "List", "Update", "Delete"});
@@ -77,17 +71,10 @@ public class Teams
         return new HBox(100, buttons.get("Create"), buttons.get("List"), buttons.get("Update"), buttons.get("Delete"));
     }
 
-    public void delete()
+    public void populateTableView()
     {
-        if (tableView.getSelectionModel().getSelectedIndex() != -1)
-        {
-            controller.delete(tableView.getSelectionModel().getSelectedItem());
-            populateTableView();
-        }
-        else
-        {
-            new PopupWindow("Removal Error", "No valid table selection.");
-        }
+        tableView.getItems().clear();
+        tableView.getItems().addAll(controller.getTeams());
     }
 
     public void update(ActionEvent e)
@@ -103,6 +90,19 @@ public class Teams
         else
         {
             new PopupWindow("Update Error", "No valid table selection.");
+        }
+    }
+
+    public void delete()
+    {
+        if (tableView.getSelectionModel().getSelectedIndex() != -1)
+        {
+            controller.delete(tableView.getSelectionModel().getSelectedItem());
+            populateTableView();
+        }
+        else
+        {
+            new PopupWindow("Removal Error", "No valid table selection.");
         }
     }
 

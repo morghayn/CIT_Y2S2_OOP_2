@@ -41,47 +41,6 @@ public class Players
         return new StackPane(temp);
     }
 
-    public TableView<Player> buildTableView()
-    {
-        tableView = new TableView<>();
-        String[] columns = new String[]{"firstName", "middleName", "lastName", "phone", "email", "numGoals", "goalie"};
-
-        for (String columnName : columns)
-        {
-            TableColumn<Player, String> column = new TableColumn<>(columnName);
-            column.setCellValueFactory(new PropertyValueFactory<>(columnName));
-            tableView.getColumns().add(column);
-            column.prefWidthProperty().bind(tableView.widthProperty().divide(columns.length));
-        }
-
-        tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        return tableView;
-    }
-
-    public void populateTableView()
-    {
-        tableView.getItems().clear();
-        tableView.getItems().addAll(controller.getPlayers());
-    }
-
-    public void populateTableView(List<Player> players)
-    {
-        tableView.getItems().clear();
-        tableView.getItems().addAll(players);
-    }
-
-    public HBox buildButtonBar()
-    {
-        Map<String, Button> buttons = form.createButtonMap(new String[]{"Create", "List", "Update", "Delete"});
-
-        buttons.get("Create").setOnAction(e -> form.popup(e, playerLayout(true)));
-        buttons.get("List").setOnAction(e -> populateTableView());
-        buttons.get("Update").setOnAction(this::update);
-        buttons.get("Delete").setOnAction(e -> delete());
-
-        return new HBox(100, buttons.get("Create"), buttons.get("List"), buttons.get("Update"), buttons.get("Delete"));
-    }
-
     private HBox buildSearchBar()
     {
         Label labelSearch = new Label("Search by Name");
@@ -104,17 +63,28 @@ public class Players
         return new HBox(50, labelSearch, fieldSearch, buttonSearch, viewTeamPlayers);
     }
 
-    public void delete()
+    public HBox buildButtonBar()
     {
-        if (tableView.getSelectionModel().getSelectedIndex() != -1)
-        {
-            controller.delete(tableView.getSelectionModel().getSelectedItem());
-            populateTableView();
-        }
-        else
-        {
-            new PopupWindow("Removal Error", "No valid table selection.");
-        }
+        Map<String, Button> buttons = form.createButtonMap(new String[]{"Create", "List", "Update", "Delete"});
+
+        buttons.get("Create").setOnAction(e -> form.popup(e, playerLayout(true)));
+        buttons.get("List").setOnAction(e -> populateTableView());
+        buttons.get("Update").setOnAction(this::update);
+        buttons.get("Delete").setOnAction(e -> delete());
+
+        return new HBox(100, buttons.get("Create"), buttons.get("List"), buttons.get("Update"), buttons.get("Delete"));
+    }
+
+    public void populateTableView()
+    {
+        tableView.getItems().clear();
+        tableView.getItems().addAll(controller.getPlayers());
+    }
+
+    public void populateTableView(List<Player> players)
+    {
+        tableView.getItems().clear();
+        tableView.getItems().addAll(players);
     }
 
     public void update(ActionEvent e)
@@ -137,6 +107,36 @@ public class Players
         {
             new PopupWindow("Update Error", "No valid table selection.");
         }
+    }
+
+    public void delete()
+    {
+        if (tableView.getSelectionModel().getSelectedIndex() != -1)
+        {
+            controller.delete(tableView.getSelectionModel().getSelectedItem());
+            populateTableView();
+        }
+        else
+        {
+            new PopupWindow("Removal Error", "No valid table selection.");
+        }
+    }
+
+    public TableView<Player> buildTableView()
+    {
+        tableView = new TableView<>();
+        String[] columns = new String[]{"firstName", "middleName", "lastName", "phone", "email", "numGoals", "goalie"};
+
+        for (String columnName : columns)
+        {
+            TableColumn<Player, String> column = new TableColumn<>(columnName);
+            column.setCellValueFactory(new PropertyValueFactory<>(columnName));
+            tableView.getColumns().add(column);
+            column.prefWidthProperty().bind(tableView.widthProperty().divide(columns.length));
+        }
+
+        tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        return tableView;
     }
 
     public StackPane playerLayout(boolean isCreate)
