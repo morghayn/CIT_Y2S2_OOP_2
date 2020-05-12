@@ -24,7 +24,7 @@ public class Team
     @JoinColumn(name = "teamID")
     private List<Player> players;
 
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.DETACH) // TODO is this enabling us to delete part of our bidirectional relationship -- INVESTIGATE!
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
     @JoinColumn(name = "managerID")
     private Manager manager;
 

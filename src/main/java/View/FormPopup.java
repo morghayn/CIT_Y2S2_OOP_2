@@ -109,7 +109,7 @@ public class FormPopup
     {
         return controller
                 .createPlayer
-                        (person, parseInt(fields.get("numGoals").getText()), true);
+                        (person, parseInt(fields.get("Goal Number").getText()), true);
     }
 
     /**

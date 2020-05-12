@@ -3,6 +3,7 @@ package View;
 import Controller.Controller;
 import Model.POJO.Manager;
 import Model.POJO.Team;
+import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -19,7 +20,12 @@ public class Teams
     private final FormPopup form;
     private final Controller controller;
     private TableView<Team> tableView;
+
+    private Map<String, TextField> fields;
+    private Map<String, Label> labels;
+    private Map<String, Button> buttons;
     private Manager manager;
+    private Team team;
 
     public Teams(Controller controller)
     {
@@ -63,9 +69,9 @@ public class Teams
     {
         Map<String, Button> buttons = form.createButtonMap(new String[] {"Create", "List", "Update", "Delete"});
 
-        buttons.get("Create").setOnAction(e -> form.popup(e, teamLayout()));
+        buttons.get("Create").setOnAction(e -> form.popup(e, teamLayout(true)));
         buttons.get("List").setOnAction(e -> populateTableView());
-        // buttons.get("Update").setOnAction(this::update);
+        buttons.get("Update").setOnAction(this::update);
         buttons.get("Delete").setOnAction(e -> delete());
 
         return new HBox(100, buttons.get("Create"), buttons.get("List"), buttons.get("Update"), buttons.get("Delete"));
@@ -84,32 +90,76 @@ public class Teams
         }
     }
 
-    public StackPane teamLayout()
+    public void update(ActionEvent e)
     {
+        if (tableView.getSelectionModel().getSelectedIndex() != -1)
+        {
+            team = tableView.getSelectionModel().getSelectedItem();
+            StackPane temp = teamLayout(false);
+            fields.get("Team Name").setText(team.getName());
+            fields.get("Jersey Colour").setText(team.getJerseyColour());
+            form.popup(e, temp);
+        }
+        else
+        {
+            new PopupWindow("Update Error", "No valid table selection.");
+        }
+    }
+
+    public StackPane teamLayout(boolean isCreate)
+    {
+        manager = null;
         String[] names = {"Team Name", "Jersey Colour"};
         boolean[] fieldConstraints = {false, false};
 
-        Map<String, TextField> fields = form.createFieldMap(names, fieldConstraints);
-        Map<String, Label> labels = form.createLabelMap(names);
-        Map<String, Button> buttons = form.createButtonMap(new String[] {"Create", "Cancel", "Select Manager"});
+        fields = form.createFieldMap(names, fieldConstraints);
+        labels = form.createLabelMap(names);
+        buttons = form.createButtonMap(new String[] {(isCreate ? "Create" : "Update"), "Cancel", "Select Manager"});
         buttons.get("Cancel").setOnAction(form::closeThis);
         HBox[] rows = {new HBox(25), new HBox(25)};
         rows[0].getChildren().addAll(labels.get(names[0]), fields.get(names[0]));
         rows[0].getChildren().addAll(labels.get(names[1]), fields.get(names[1]));
 
-
+        buttons.get(isCreate ? "Create" : "Update").setOnAction(isCreate ? this::submitForm : this::submitUpdate);
         buttons.get("Select Manager").setOnAction(e -> form.popup(e, selectManager()));
         rows[0].getChildren().addAll(buttons.get("Select Manager"));
-        rows[1] = new HBox(25, buttons.get("Create"), buttons.get("Cancel"));
+        rows[1] = new HBox(25, buttons.get(isCreate ? "Create" : "Update"), buttons.get("Cancel"));
 
         VBox temp = new VBox(25, rows[0], rows[1]);
         temp.setPadding(new Insets(50, 20, 20, 20));
         return new StackPane(temp);
     }
 
+    public void submitForm(ActionEvent e)
+    {
+        Team team = controller.createTeam(fields.get("Team Name").getText(), fields.get("Jersey Colour").getText());
+        controller.persistTeam(team);
+        if (manager != null)
+        {
+            controller.setManagerOfTeam(team, manager);
+        }
+        populateTableView();
+        form.closeThis(e);
+    }
+
+    public void submitUpdate(ActionEvent e)
+    {
+        Team team = controller.createTeam(fields.get("Team Name").getText(), fields.get("Jersey Colour").getText());
+        team.setTeamID(this.team.getTeamID());
+        this.team = team;
+        controller.updateTeam(this.team);
+
+        if (manager != null)
+        {
+            controller.setManagerOfTeam(this.team, manager);
+        }
+
+        populateTableView();
+        form.closeThis(e);
+    }
+
     public StackPane selectManager()
     {
-        manager = null;
         Label labelManagers = new Label("Select Manager");
         ComboBox<String> comboManagers = new ComboBox<>();
         AppTheme.set(labelManagers);
@@ -117,7 +167,7 @@ public class Teams
         List<Manager> managers = controller.getManagers();
         managers.forEach(m -> comboManagers.getItems().add(m.getFirstName() + " " + m.getLastName()));
 
-        Map<String, Button> buttons = form.createButtonMap(new String[]{"Select", "Cancel"});
+        Map<String, Button> buttons = form.createButtonMap(new String[] {"Select", "Cancel"});
         buttons.get("Cancel").setOnAction(form::closeThis);
         buttons.get("Select").setOnAction(e -> {
             int index = comboManagers.getSelectionModel().getSelectedIndex();
@@ -134,4 +184,3 @@ public class Teams
     }
 
 }
-// 74 ->

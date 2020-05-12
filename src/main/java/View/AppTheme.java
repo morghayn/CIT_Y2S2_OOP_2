@@ -17,7 +17,7 @@ public class AppTheme
     public static void set(Button button)
     {
         button.setStyle(
-                "-fx-min-width: 70;" + /*"-fx-background-color: #dc143c;" +*/
+                "-fx-min-width: 100;" + /*"-fx-background-color: #dc143c;" +*/
                 "-fx-padding: 5 5 5 5;" +
                 "-fx-font-size: 13px;" /*"-fx-text-fill: #ffffff;"*/
         );

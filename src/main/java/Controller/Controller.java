@@ -106,10 +106,35 @@ public class Controller
         teamDAO.update(team);
     }
 
+    public void setManagerOfTeam(Team team, Manager manager)
+    {
+        Team prevTeam = manager.getTeam();
+        if (prevTeam != null)
+        {
+            prevTeam.setManager(null);
+            updateTeam(prevTeam);
+        }
+        team.setManager(manager);
+        updateTeam(team);
+    }
+
+    public void setPlayersTeam(Team team, Player player)
+    {
+        team.addPlayer(player);
+        updateTeam(team);
+    }
+
     // DELETE
 
     public void delete(Manager manager)
     {
+        Team managerTeam = manager.getTeam();
+        if (managerTeam != null)
+        {
+            managerTeam.setManager(null);
+            updateTeam(managerTeam);
+        }
+        manager.setTeam(null);
         managerDAO.remove(manager);
     }
 

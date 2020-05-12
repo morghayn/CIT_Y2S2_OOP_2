@@ -35,13 +35,4 @@ public class Manager extends Person
         setStarRating(starRating);
     }
 
-    public void setTeam(Team team)
-    {
-        if (this.team != null)
-        {
-            this.team = team;
-            team.setManager(this);
-            this.team.setManager(null);
-        }
-    }
 }

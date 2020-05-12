@@ -3,6 +3,7 @@ package View;
 import Controller.Controller;
 import Model.POJO.Player;
 import Model.POJO.Team;
+import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -16,10 +17,15 @@ import java.util.Map;
 public class Players
 {
 
-    private Team team;
     private final FormPopup form;
     private final Controller controller;
     private TableView<Player> tableView;
+
+    private Map<String, TextField> fields;
+    private Map<String, Label> labels;
+    private Map<String, Button> buttons;
+    private Player player;
+    private Team team;
 
     public Players(Controller controller)
     {
@@ -58,13 +64,19 @@ public class Players
         tableView.getItems().addAll(controller.getPlayers());
     }
 
+    public void populateTableView(List<Player> players)
+    {
+        tableView.getItems().clear();
+        tableView.getItems().addAll(players);
+    }
+
     public HBox buildButtonBar()
     {
         Map<String, Button> buttons = form.createButtonMap(new String[]{"Create", "List", "Update", "Delete"});
 
-        buttons.get("Create").setOnAction(e -> form.popup(e, playerLayout()));
+        buttons.get("Create").setOnAction(e -> form.popup(e, playerLayout(true)));
         buttons.get("List").setOnAction(e -> populateTableView());
-        // buttons.get("Update").setOnAction(this::update);
+        buttons.get("Update").setOnAction(this::update);
         buttons.get("Delete").setOnAction(e -> delete());
 
         return new HBox(100, buttons.get("Create"), buttons.get("List"), buttons.get("Update"), buttons.get("Delete"));
@@ -77,15 +89,19 @@ public class Players
         Button buttonSearch = new Button("Search");
         AppTheme.set(labelSearch);
         AppTheme.set(buttonSearch);
-        buttonSearch.setOnAction(e -> {
-            tableView.getItems().clear();
-            tableView.getItems().addAll(controller.searchName(fieldSearch.getText()));
-        });
+        buttonSearch.setOnAction(e -> populateTableView(controller.searchName(fieldSearch.getText())));
 
-        // Todo Team Select
-        //Button viewTeamPlayers = new Button("Team Players");
-        //viewTeamPlayers.setOnAction(e -> form.pop(e, teamSelectLayout()));
-        return new HBox(50, labelSearch, fieldSearch, buttonSearch);//, viewTeamPlayers);
+        Button viewTeamPlayers = new Button("View Players by Team");
+        AppTheme.set(viewTeamPlayers);
+        viewTeamPlayers.setOnAction(e -> {
+            team = null;
+            form.popup(e, selectTeam());
+            if (team != null)
+            {
+                populateTableView(controller.getTeamPlayers(team));
+            }
+        });
+        return new HBox(50, labelSearch, fieldSearch, buttonSearch, viewTeamPlayers);
     }
 
     public void delete()
@@ -101,30 +117,78 @@ public class Players
         }
     }
 
-    public StackPane playerLayout()
+    public void update(ActionEvent e)
     {
+        if (tableView.getSelectionModel().getSelectedIndex() != -1)
+        {
+            player = tableView.getSelectionModel().getSelectedItem();
+            StackPane temp = playerLayout(false);
+            fields.get("First Name").setText(player.getFirstName());
+            fields.get("Middle Name").setText(player.getMiddleName());
+            fields.get("Last Name").setText(player.getLastName());
+            fields.get("Phone").setText(player.getPhone());
+            fields.get("Email").setText(player.getEmail());
+            //fields.get("Goal Number").setText(player.getNumGoals());
+            //fields.get("Goalie").setText(player.get
+            form.popup(e, temp);
+            populateTableView();
+        }
+        else
+        {
+            new PopupWindow("Update Error", "No valid table selection.");
+        }
+    }
+
+    public StackPane playerLayout(boolean isCreate)
+    {
+        team = null;
         String[] names = {"First Name", "Middle Name", "Last Name", "Phone", "Email", "Goal Number", "Goalie"};
         boolean[] fieldConstraints = {false, false, false, true, false, true, false};
 
-        Map<String, Label> labels = form.createLabelMap(names);
-        Map<String, TextField> fields = form.createFieldMap(names, fieldConstraints);
-        Map<String, Button> buttons = form.createButtonMap(new String[]{"Create", "Cancel", "Select Team"});
+        labels = form.createLabelMap(names);
+        fields = form.createFieldMap(names, fieldConstraints);
+        buttons = form.createButtonMap(new String[]{(isCreate ? "Create" : "Update"), "Cancel", "Select Team"});
         buttons.get("Cancel").setOnAction(form::closeThis);
         HBox[] rows = form.createHBoxes(4);
         form.binGUIComponents(names, rows, labels, fields);
 
-        buttons.get("Create").setOnAction(e -> {
-            // todo Create / Submit
-            form.closeThis(e);
-        });
+        buttons.get((isCreate ? "Create" : "Update")).setOnAction(isCreate ? this::submitForm : this::submitUpdate);
 
         buttons.get("Select Team").setOnAction(e -> form.popup(e, selectTeam()));
         rows[2].getChildren().addAll(buttons.get("Select Team"));
-        rows[3].getChildren().addAll(buttons.get("Create"), buttons.get("Cancel"));
+        rows[3].getChildren().addAll(buttons.get((isCreate ? "Create" : "Update")), buttons.get("Cancel"));
 
         VBox temp = new VBox(25, rows[0], rows[1], rows[2], rows[3]);
         temp.setPadding(new Insets(50, 20, 20, 20));
         return new StackPane(temp);
+    }
+
+    public void submitForm(ActionEvent e)
+    {
+        Player player = form.createPlayer(fields, form.createPerson(fields, form.createName(fields)));
+        controller.persistPlayer(player);
+        if (team != null)
+        {
+            controller.setPlayersTeam(team, player);
+        }
+        populateTableView();
+        form.closeThis(e);
+    }
+
+    public void submitUpdate(ActionEvent e)
+    {
+        Player player = form.createPlayer(fields, form.createPerson(fields, form.createName(fields)));
+        player.setPersonID(this.player.getPersonID());
+        this.player = player;
+        controller.updatePlayer(this.player);
+
+        if (team != null)
+        {
+            controller.setPlayersTeam(team, this.player);
+        }
+
+        populateTableView();
+        form.closeThis(e);
     }
 
     public StackPane selectTeam()
@@ -154,4 +218,3 @@ public class Players
     }
 
 }
-// 73 -> 86 (228 unofficial)
