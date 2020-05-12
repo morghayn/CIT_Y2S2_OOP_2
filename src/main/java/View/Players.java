@@ -40,6 +40,12 @@ public class Players
         form = new Form(controller);
     }
 
+    /**
+     * <p>Driver GUI component in which numerous GUI components are assembled into a StackPane, returned to the main
+     * class and added to the tabbed layout.</p>
+     *
+     * @return a StackPane containing all the GUI components pertaining to this particular form
+     */
     public StackPane setup()
     {
         VBox temp = new VBox(25, buildSearchBar(), buildButtonBar(), buildTableView());
@@ -48,6 +54,12 @@ public class Players
         return new StackPane(temp);
     }
 
+    /**
+     * <p>Driver method which builds a HBox comprising of search functionality pertaining
+     * this class and the primary domain object of concern.</p>
+     *
+     * @return the HBox comprising of search functionality
+     */
     private HBox buildSearchBar()
     {
         Label labelSearch = new Label("Search by Name");
@@ -64,6 +76,12 @@ public class Players
         return temp;
     }
 
+    /**
+     * <p>Driver method which builds a HBox comprising of buttons that will emit actions for functionality pertaining
+     * this class.</p>
+     *
+     * @return the HBox comprising of functionality buttons
+     */
     public HBox buildButtonBar()
     {
         Map<String, Button> buttons = form.createButtonMap(new String[]{"Create", "List", "Update", "Delete", "Team Filter"});
@@ -92,12 +110,11 @@ public class Players
         return temp;
     }
 
-    public void populateTableView()
-    {
-        tableView.getItems().clear();
-        tableView.getItems().addAll(controller.getPlayers());
-    }
-
+    /**
+     * <p>If a valid selection is made within the TableView within this class, this method will attempt to retrieve
+     * extra information pertaining the object selected within the TableView. If a valid selection is not found
+     * within the TableView, an error will be displayed through an instance of ${@link PopupWindow}.</p>
+     */
     public void extraPlayerDetails()
     {
         if (tableView.getSelectionModel().getSelectedIndex() != -1)
@@ -111,6 +128,15 @@ public class Players
         }
     }
 
+    /**
+     * <p>Attempts to begin the update process for the currently selected domain object within the TableView of this
+     * class. If such a selection is valid, this method will act as a driver method, working in conjunction with other
+     * methods such as ${@link #submitUpdate(ActionEvent)}. If such a selection is not valid, an error message will be
+     * delivered to the end user via a popup instance of ${@link PopupWindow}.</p>
+     *
+     * @param e the ActionEvent in which is driving this event. Used to close down the window opened during this
+     *          process
+     */
     public void update(ActionEvent e)
     {
         if (tableView.getSelectionModel().getSelectedIndex() != -1)
@@ -133,6 +159,10 @@ public class Players
         }
     }
 
+    /**
+     * <p>Attempts to remove the currently selected domain object within the TableView in this class. If no object is
+     * selected within the TableView an error popup is displayed to notify the end user.</p>
+     */
     public void delete()
     {
         if (tableView.getSelectionModel().getSelectedIndex() != -1)
@@ -146,6 +176,11 @@ public class Players
         }
     }
 
+    /**
+     * <p>Builds a TableView concerning the primary domain object of this class.</p>
+     *
+     * @return a TableView of the same type as the primary domain object concerning this class
+     */
     public TableView<Player> buildTableView()
     {
         tableView = new TableView<>();
@@ -163,12 +198,34 @@ public class Players
         return tableView;
     }
 
+    /**
+     * <p>Populates the TableView with a collection comprised of object instances pertaining the primary domain object
+     * of concern for this class.</p>
+     */
+    public void populateTableView()
+    {
+        tableView.getItems().clear();
+        tableView.getItems().addAll(controller.getPlayers());
+    }
+
+    /**
+     * <p>Populates the TableView with a collection comprised of object instances pertaining the primary domain object
+     * of concern for this class.</p>
+     *
+     * @param players the domain specific to the TableView in question
+     */
     public void populateTableView(List<Player> players)
     {
         tableView.getItems().clear();
         tableView.getItems().addAll(players);
     }
 
+    /**
+     * <p>A multi-purpose method, which works in conjunction with {@link Form} to build forms for either updating or
+     * creating information regarding the domain of concern.</p>
+     *
+     * @param isCreate a boolean which helps the method distinguish what type of form is currently needed
+     */
     public StackPane playerLayout(boolean isCreate)
     {
         team = null;
@@ -206,6 +263,12 @@ public class Players
         return new StackPane(temp);
     }
 
+    /**
+     * <p>In conjunction with the create form, this method acts as closure when the create button is pressed by
+     * collecting the information entered, sending it onto the form class, and then onto the controller.</p>
+     *
+     * @param e the event which is driving the create form. Used to close the currently opened form
+     */
     public void submitForm(ActionEvent e)
     {
         boolean _isGoalie = goalie.getSelectedToggle().equals(isGoalie);
@@ -219,6 +282,12 @@ public class Players
         form.closeThis(e);
     }
 
+    /**
+     * <p>In conjunction with the update form, this method acts as closure when the update button is pressed by
+     * collecting the information entered, sending it onto the form class, and then onto the controller.</p>
+     *
+     * @param e the event which is driving the update form. Used to close the currently opened form
+     */
     public void submitUpdate(ActionEvent e)
     {
         // creating new updated player
@@ -242,6 +311,11 @@ public class Players
         form.closeThis(e);
     }
 
+    /**
+     * <p>A GUI component used to select a Team instance from all Team instances available.</p>
+     *
+     * @return a StackPane for selecting a Team
+     */
     public StackPane selectTeam()
     {
         Label labelTeams = new Label("Select Team");

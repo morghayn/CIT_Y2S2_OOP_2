@@ -1,12 +1,14 @@
 package Model.POJO;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @Entity
 @NamedQuery(name="Player.Retrieve", query="SELECT p FROM Player p")
 @PrimaryKeyJoinColumn(name = "personID")
@@ -18,11 +20,6 @@ public class Player extends Person
     @ManyToOne
     @JoinColumn(name = "teamID")
     private Team team;
-
-    public Player()
-    {
-
-    }
 
     public Player(Person person, int numGoals, boolean goalie)
     {

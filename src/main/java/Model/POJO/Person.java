@@ -1,14 +1,14 @@
 package Model.POJO;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 public class Person
@@ -21,11 +21,6 @@ public class Person
 
     @Embedded
     protected Name name;
-
-    public Person()
-    {
-
-    }
 
     public Person(Name name, String phone, String email)
     {

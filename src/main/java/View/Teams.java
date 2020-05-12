@@ -35,6 +35,12 @@ public class Teams
         form = new Form(controller);
     }
 
+    /**
+     * <p>Driver GUI component in which numerous GUI components are assembled into a StackPane, returned to the main
+     * class and added to the tabbed layout.</p>
+     *
+     * @return a StackPane containing all the GUI components pertaining to this particular form
+     */
     public StackPane setup()
     {
         VBox temp = new VBox(25, buildButtonBar(), buildTableView());
@@ -43,6 +49,71 @@ public class Teams
         return new StackPane(temp);
     }
 
+    /**
+     * <p>Driver method which builds a HBox comprising of buttons that will emit actions for functionality pertaining
+     * this class.</p>
+     *
+     * @return the HBox comprising of functionality buttons
+     */
+    public HBox buildButtonBar()
+    {
+        Map<String, Button> buttons = form.createButtonMap(new String[]{"Create", "List", "Update", "Delete"});
+
+        buttons.get("Create").setOnAction(e -> form.popup(e, teamLayout(true), 920, 280));
+        buttons.get("List").setOnAction(e -> populateTableView());
+        buttons.get("Update").setOnAction(this::update);
+        buttons.get("Delete").setOnAction(e -> delete());
+
+        return new HBox(100, buttons.get("Create"), buttons.get("List"), buttons.get("Update"), buttons.get("Delete"));
+    }
+
+    /**
+     * <p>Attempts to begin the update process for the currently selected domain object within the TableView of this
+     * class. If such a selection is valid, this method will act as a driver method, working in conjunction with other
+     * methods such as ${@link #submitUpdate(ActionEvent)}. If such a selection is not valid, an error message will be
+     * delivered to the end user via a popup instance of ${@link PopupWindow}.</p>
+     *
+     * @param e the ActionEvent in which is driving this event. Used to close down the window opened during this
+     *          process
+     */
+    public void update(ActionEvent e)
+    {
+        if (tableView.getSelectionModel().getSelectedIndex() != -1)
+        {
+            team = tableView.getSelectionModel().getSelectedItem();
+            StackPane temp = teamLayout(false);
+            fields.get("Team Name").setText(team.getName());
+            fields.get("Jersey Colour").setText(team.getJerseyColour());
+            form.popup(e, temp, 920, 280);
+        }
+        else
+        {
+            new PopupWindow("Update Error", "No valid table selection.");
+        }
+    }
+
+    /**
+     * <p>Attempts to remove the currently selected domain object within the TableView in this class. If no object is
+     * selected within the TableView an error popup is displayed to notify the end user.</p>
+     */
+    public void delete()
+    {
+        if (tableView.getSelectionModel().getSelectedIndex() != -1)
+        {
+            controller.delete(tableView.getSelectionModel().getSelectedItem());
+            populateTableView();
+        }
+        else
+        {
+            new PopupWindow("Removal Error", "No valid table selection.");
+        }
+    }
+
+    /**
+     * <p>Builds a TableView concerning the primary domain object of this class.</p>
+     *
+     * @return a TableView of the same type as the primary domain object concerning this class
+     */
     public TableView<Team> buildTableView()
     {
         tableView = new TableView<>();
@@ -61,53 +132,22 @@ public class Teams
         return tableView;
     }
 
-    public void update(ActionEvent e)
-    {
-        if (tableView.getSelectionModel().getSelectedIndex() != -1)
-        {
-            team = tableView.getSelectionModel().getSelectedItem();
-            StackPane temp = teamLayout(false);
-            fields.get("Team Name").setText(team.getName());
-            fields.get("Jersey Colour").setText(team.getJerseyColour());
-            form.popup(e, temp, 920, 280);
-        }
-        else
-        {
-            new PopupWindow("Update Error", "No valid table selection.");
-        }
-    }
-
-    public void delete()
-    {
-        if (tableView.getSelectionModel().getSelectedIndex() != -1)
-        {
-            controller.delete(tableView.getSelectionModel().getSelectedItem());
-            populateTableView();
-        }
-        else
-        {
-            new PopupWindow("Removal Error", "No valid table selection.");
-        }
-    }
-
-    public HBox buildButtonBar()
-    {
-        Map<String, Button> buttons = form.createButtonMap(new String[]{"Create", "List", "Update", "Delete"});
-
-        buttons.get("Create").setOnAction(e -> form.popup(e, teamLayout(true), 920, 280));
-        buttons.get("List").setOnAction(e -> populateTableView());
-        buttons.get("Update").setOnAction(this::update);
-        buttons.get("Delete").setOnAction(e -> delete());
-
-        return new HBox(100, buttons.get("Create"), buttons.get("List"), buttons.get("Update"), buttons.get("Delete"));
-    }
-
+    /**
+     * <p>Populates the TableView with a collection comprised of object instances pertaining the primary domain object
+     * of concern for this class.</p>
+     */
     public void populateTableView()
     {
         tableView.getItems().clear();
         tableView.getItems().addAll(controller.getTeams());
     }
 
+    /**
+     * <p>A multi-purpose method, which works in conjunction with {@link Form} to build forms for either updating or
+     * creating information regarding the domain of concern.</p>
+     *
+     * @param isCreate a boolean which helps the method distinguish what type of form is currently needed
+     */
     public StackPane teamLayout(boolean isCreate)
     {
         manager = null;
@@ -132,6 +172,12 @@ public class Teams
         return new StackPane(temp);
     }
 
+    /**
+     * <p>In conjunction with the create form, this method acts as closure when the create button is pressed by
+     * collecting the information entered, sending it onto the form class, and then onto the controller.</p>
+     *
+     * @param e the event which is driving the create form. Used to close the currently opened form
+     */
     public void submitForm(ActionEvent e)
     {
         Team team = controller.createTeam(fields.get("Team Name").getText(), fields.get("Jersey Colour").getText());
@@ -144,6 +190,12 @@ public class Teams
         form.closeThis(e);
     }
 
+    /**
+     * <p>In conjunction with the update form, this method acts as closure when the update button is pressed by
+     * collecting the information entered, sending it onto the form class, and then onto the controller.</p>
+     *
+     * @param e the event which is driving the update form. Used to close the currently opened form
+     */
     public void submitUpdate(ActionEvent e)
     {
         // creating new updated team
@@ -167,6 +219,11 @@ public class Teams
         form.closeThis(e);
     }
 
+    /**
+     * <p> A GUI component used to select a Manager instance from all Manager instances available </p>
+     *
+     * @return a StackPane for selecting a Manager
+     */
     public StackPane selectManager()
     {
         Label labelManagers = new Label("Select Manager");
@@ -185,7 +242,7 @@ public class Teams
 
         Map<String, Button> buttons = form.createButtonMap(new String[]{"Remove Manager", "Select", "Cancel"});
         buttons.get("Cancel").setOnAction(form::closeThis);
-        buttons.get("Remove Manager").setOnAction(e-> {
+        buttons.get("Remove Manager").setOnAction(e -> {
             manager = null;
             comboManagers.getSelectionModel().select(-1);
         });

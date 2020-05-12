@@ -1,6 +1,7 @@
 package Model.POJO;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -8,8 +9,9 @@ import java.time.LocalDate;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @Entity
-@NamedQuery(name="Manager.Retrieve", query="SELECT m FROM Manager m")
+@NamedQuery(name = "Manager.Retrieve", query = "SELECT m FROM Manager m")
 @PrimaryKeyJoinColumn(name = "personID")
 public class Manager extends Person
 {
@@ -18,11 +20,6 @@ public class Manager extends Person
 
     @OneToOne(mappedBy = "manager")//, cascade = CascadeType.DETACH, fetch = FetchType.EAGER)
     private Team team;
-
-    public Manager()
-    {
-
-    }
 
     public Manager(Person person, LocalDate dateOfBirth, int starRating)
     {
@@ -35,5 +32,4 @@ public class Manager extends Person
         setDateOfBirth(dateOfBirth);
         setStarRating(starRating);
     }
-
 }

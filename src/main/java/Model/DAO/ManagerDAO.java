@@ -1,8 +1,6 @@
 package Model.DAO;
 
 import Model.POJO.Manager;
-import Model.POJO.Player;
-import Model.POJO.Team;
 
 import javax.persistence.*;
 import java.util.List;

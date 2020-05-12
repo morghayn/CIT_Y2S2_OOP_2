@@ -1,8 +1,6 @@
 package Model.DAO;
 
-import Model.POJO.Person;
 import Model.POJO.Player;
-import Model.POJO.Team;
 
 import javax.persistence.*;
 import java.util.List;
@@ -196,63 +194,3 @@ public class PlayerDAO
     }
 
 }
-
-/*
-    public Person getPerson(long id)
-    {
-        EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
-        EntityTransaction et = null;
-        Person person = null;
-
-        try
-        {
-            et = em.getTransaction();
-            et.begin();
-
-            person = em.find(Person.class, id);
-
-            et.commit();
-        }
-        catch (Exception ex)
-        {
-            if (et != null)
-            {
-                et.rollback();
-            }
-            ex.printStackTrace();
-        }
-        finally
-        {
-            em.close();
-        }
-
-        return person;
-    }
-
-    public void remove(Person person)
-    {
-        EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
-        EntityTransaction et = null;
-
-        try
-        {
-            et = em.getTransaction();
-            et.begin();
-            em.remove(em.contains(person) ? person : em.merge(person));
-
-            et.commit();
-        }
-        catch (Exception ex)
-        {
-            if (et != null)
-            {
-                et.rollback();
-            }
-            ex.printStackTrace();
-        }
-        finally
-        {
-            em.close();
-        }
-    }
-*/

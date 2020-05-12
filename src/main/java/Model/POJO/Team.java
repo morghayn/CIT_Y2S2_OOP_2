@@ -30,7 +30,7 @@ public class Team
 
     public Team()
     {
-        players = new ArrayList<Player>();
+        players = new ArrayList<>();
     }
 
     public Team(String name, String jerseyColour)
