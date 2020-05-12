@@ -21,4 +21,5 @@ class PopupWindow
         alert.setContentText(message);
         alert.showAndWait();
     }
+
 }

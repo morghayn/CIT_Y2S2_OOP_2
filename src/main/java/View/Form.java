@@ -12,30 +12,31 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.UnaryOperator;
 
 import static java.lang.Integer.parseInt;
 
-public class FormPopup
+public class Form
 {
 
     private final Controller controller;
 
-    public FormPopup(Controller controller)
+    public Form(Controller controller)
     {
         this.controller = controller;
     }
 
-    public void popup(ActionEvent e, StackPane form)
+    public void popup(ActionEvent e, StackPane form, int width, int height)
     {
         final Node source = (Node) e.getSource();
         final Stage stage = (Stage) source.getScene().getWindow();
 
         Group root = new Group();
         Stage dialog = new Stage();
-        Scene temp = new Scene(root, 920, 280);
+        Scene temp = new Scene(root, width, height);
         dialog.setScene(temp);
         root.getChildren().add(form);
 
@@ -95,21 +96,25 @@ public class FormPopup
     {
         return controller
                 .createPerson
-                        (name, fields.get("Email").getText(), fields.get("Phone").getText());
+                        (name, fields.get("Phone").getText(), fields.get("Email").getText());
     }
 
-    public Manager createManager(Map<String, TextField> fields, Person person)
+    public Manager createManager(Map<String, TextField> fields, LocalDate dateOfBirth, Person person)
     {
+        String temp = fields.get("Star Rating").getText();
+        int starRating = (temp.equals("") ? 0 : parseInt(temp));
         return controller
                 .createManager
-                        (person, fields.get("Date of Birth").getText(), parseInt(fields.get("Star Rating").getText()));
+                        (person, dateOfBirth, starRating);
     }
 
-    public Player createPlayer(Map<String, TextField> fields, Person person)
+    public Player createPlayer(Map<String, TextField> fields, boolean goalie, Person person)
     {
+        String temp = fields.get("Goal Number").getText();
+        int goalNum = (temp.equals("") ? 0 : parseInt(temp));
         return controller
                 .createPlayer
-                        (person, parseInt(fields.get("Goal Number").getText()), true);
+                        (person, goalNum, goalie);
     }
 
     /**

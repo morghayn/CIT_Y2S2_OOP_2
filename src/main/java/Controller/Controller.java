@@ -6,6 +6,7 @@ import Model.DAO.TeamDAO;
 import Model.POJO.*;
 
 import javax.persistence.EntityManagerFactory;
+import java.time.LocalDate;
 import java.util.List;
 
 public class Controller
@@ -33,7 +34,7 @@ public class Controller
         return new Person(name, phone, email);
     }
 
-    public Manager createManager(Person person, String dateOfBirth, int starRating)
+    public Manager createManager(Person person, LocalDate dateOfBirth, int starRating)
     {
         return new Manager(person, dateOfBirth, starRating);
     }
@@ -88,6 +89,40 @@ public class Controller
     public List<Player> getTeamPlayers(Team team)
     {
         return team.getPlayers();
+    }
+
+    public String getExtraPlayerDetails(Player player)
+    {
+        Team team = player.getTeam();
+        Manager manager = team != null ? team.getManager() : null;
+        return (
+                "\nTeam Details: " +
+                (team != null ?
+                 "\n- Team Name: " + team.getName() +
+                 "\n- Jersey Colour: " + team.getJerseyColour()
+                              : "\nNo team details, team is null!") +
+
+                "\n\nManager Details: " +
+                (manager != null ?
+                 "\n- Name: " + manager.getFirstName() + " " + manager.getMiddleName() + " " + manager.getLastName() +
+                 "\n- Date of Birth: " + manager.getDateOfBirth().toString() +
+                 "\n- Phone: " + manager.getPhone() +
+                 "\n- Email: " + manager.getEmail()
+                                 : "\nNo Manager, so no details available!")
+        );
+    }
+
+    public String getManagerTeam(Manager manager)
+    {
+        Team team = manager.getTeam();
+        String str = "Manager is not assigned a team currently!";
+
+        if(team != null)
+        {
+            str = "Team name: \n\n- " + team.getName();
+        }
+
+        return str;
     }
 
     // Update
