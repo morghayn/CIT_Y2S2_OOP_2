@@ -58,34 +58,23 @@ public class Managers
      */
     public HBox buildButtonBar()
     {
-        Map<String, Button> buttons = form.createButtonMap(new String[]{"Create", "List", "Update", "Delete", "Show Team"});
-        buttons.get("Show Team").setOnAction(e -> showTeam());
+        Map<String, Button> buttons = form.createButtonMap(new String[]{"Create", "List", "Update", "Delete", "Team's Manager"});
+
         buttons.get("Create").setOnAction(e -> form.popup(e, managerLayout(true), 920, 260));
         buttons.get("List").setOnAction(e -> populateTableView());
         buttons.get("Update").setOnAction(this::update);
         buttons.get("Delete").setOnAction(e -> delete());
+        buttons.get("Team's Manager").setOnAction(e -> {
+            form.popup(e, selectTeam(), 375, 185); // TODO get optimal dimensions
+            if (team != null)
+            {
+                populateTableView(controller.getTeamManager(team));
+            }
+        });
 
-        HBox temp = new HBox(50, buttons.get("Create"), buttons.get("List"), buttons.get("Update"), buttons.get("Delete"), buttons.get("Show Team"));
+        HBox temp = new HBox(50, buttons.get("Create"), buttons.get("List"), buttons.get("Update"), buttons.get("Delete"), buttons.get("Team's Manager"));
         temp.setAlignment(BASELINE_CENTER);
         return temp;
-    }
-
-    /**
-     * <p>If a valid selection is made within the TableView within this class, this method will attempt to retrieve
-     * current team information pertaining the object selected within the TableView. If a valid selection is not found
-     * within the TableView, an error will be displayed through an instance of ${@link PopupWindow}.</p>
-     */
-    public void showTeam()
-    {
-        if (tableView.getSelectionModel().getSelectedIndex() != -1)
-        {
-            manager = tableView.getSelectionModel().getSelectedItem();
-            new PopupWindow("", controller.getManagerTeam(manager));
-        }
-        else
-        {
-            new PopupWindow("Update Error", "No valid table selection.");
-        }
     }
 
     /**
@@ -166,6 +155,17 @@ public class Managers
     {
         tableView.getItems().clear();
         tableView.getItems().addAll(controller.getManagers());
+    }
+
+    /**
+     * <p>Populates the TableView with an object instances passed through it's parameters.</p>
+     *
+     * @param manager the domain specific to the TableView in question
+     */
+    public void populateTableView(Manager manager)
+    {
+        tableView.getItems().clear();
+        tableView.getItems().addAll(manager);
     }
 
     /**

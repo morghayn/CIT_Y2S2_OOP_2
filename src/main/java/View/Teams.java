@@ -57,14 +57,23 @@ public class Teams
      */
     public HBox buildButtonBar()
     {
-        Map<String, Button> buttons = form.createButtonMap(new String[]{"Create", "List", "Update", "Delete"});
+        Map<String, Button> buttons = form.createButtonMap(new String[]{"Create", "List", "Update", "Delete", "Manager's Team"});
 
         buttons.get("Create").setOnAction(e -> form.popup(e, teamLayout(true), 920, 280));
         buttons.get("List").setOnAction(e -> populateTableView());
         buttons.get("Update").setOnAction(this::update);
         buttons.get("Delete").setOnAction(e -> delete());
+        buttons.get("Manager's Team").setOnAction(e -> {
+            form.popup(e, selectManager(), 375, 185); // TODO get optimal dimensions
+            if (manager != null)
+            {
+                populateTableView(controller.getManagerTeam(manager));
+            }
+        });
 
-        return new HBox(100, buttons.get("Create"), buttons.get("List"), buttons.get("Update"), buttons.get("Delete"));
+        HBox temp = new HBox(50, buttons.get("Create"), buttons.get("List"), buttons.get("Update"), buttons.get("Delete"), buttons.get("Manager's Team"));
+        temp.setAlignment(BASELINE_CENTER);
+        return temp;
     }
 
     /**
@@ -140,6 +149,17 @@ public class Teams
     {
         tableView.getItems().clear();
         tableView.getItems().addAll(controller.getTeams());
+    }
+
+    /**
+     * <p>Populates the TableView with an object instances passed through it's parameters.</p>
+     *
+     * @param team the domain specific to the TableView in question
+     */
+    public void populateTableView(Team team)
+    {
+        tableView.getItems().clear();
+        tableView.getItems().addAll(team);
     }
 
     /**

@@ -30,7 +30,7 @@ public class Main extends Application
             BorderPane mainPane = new BorderPane();
             Group root = new Group();
             primaryStage.setTitle("League Management System");
-            Scene scene = new Scene(root, 748, 420);
+            Scene scene = new Scene(root, 850, 450);
 
             setup();
             mainPane.setCenter(tabPane);

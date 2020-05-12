@@ -72,7 +72,7 @@ public class Players
         buttonExtra.setOnAction(e -> extraPlayerDetails());
         buttonSearch.setOnAction(e -> populateTableView(controller.searchName(fieldSearch.getText())));
         HBox temp = new HBox(50, labelSearch, fieldSearch, buttonSearch, buttonExtra);
-        temp.setAlignment(BASELINE_LEFT);
+        temp.setAlignment(BASELINE_CENTER);
         return temp;
     }
 

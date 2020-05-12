@@ -22,8 +22,8 @@ public class Home
 
     public StackPane setup()
     {
-        ImageView imageView = new ImageView();
-        imageView.setImage(new Image(getClass().getResourceAsStream("/balls.jpg")));
+        //ImageView imageView = new ImageView();
+        //imageView.setImage(new Image(getClass().getResourceAsStream("/balls.jpg")));
 
         Button quit = new Button("Quit");
         quit.setOnAction(this::quitProgram);
@@ -32,7 +32,7 @@ public class Home
         VBox mainColumn = new VBox(50, quit);
         mainColumn.setPadding(new Insets(50, 20, 20, 20));
 
-        return new StackPane(imageView, mainColumn);
+        return new StackPane(mainColumn); // imgview should go in here eventually pls
     }
 
     private void quitProgram(ActionEvent e)

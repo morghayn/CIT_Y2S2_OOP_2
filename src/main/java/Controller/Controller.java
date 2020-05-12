@@ -91,6 +91,16 @@ public class Controller
         return team.getPlayers();
     }
 
+    public Manager getTeamManager(Team team)
+    {
+        return team.getManager();
+    }
+
+    public Team getManagerTeam(Manager manager)
+    {
+        return manager.getTeam();
+    }
+
     public String getExtraPlayerDetails(Player player)
     {
         Team team = player.getTeam();
@@ -110,19 +120,6 @@ public class Controller
                  "\n- Email: " + manager.getEmail()
                                  : "\nNo Manager, so no details available!")
         );
-    }
-
-    public String getManagerTeam(Manager manager)
-    {
-        Team team = manager.getTeam();
-        String str = "Manager is not assigned a team currently!";
-
-        if(team != null)
-        {
-            str = "Team name: \n\n- " + team.getName();
-        }
-
-        return str;
     }
 
     // Update
