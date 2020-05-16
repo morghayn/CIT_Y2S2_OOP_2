@@ -11,11 +11,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
-import java.util.List;
 import java.util.Map;
 
 import static javafx.geometry.Pos.BASELINE_CENTER;
-import static javafx.geometry.Pos.CENTER;
 
 public class Teams
 {
@@ -29,11 +27,13 @@ public class Teams
     private Map<String, Button> buttons;
     private Manager manager;
     private Team team;
+    private SelectionPopup selectionPopup;
 
     public Teams(Controller controller)
     {
         this.controller = controller;
         form = new Form(controller);
+        selectionPopup = new SelectionPopup(form, controller);
     }
 
     /**
@@ -65,8 +65,8 @@ public class Teams
         buttons.get("Update").setOnAction(this::update);
         buttons.get("Delete").setOnAction(e -> delete());
         buttons.get("Manager's Team").setOnAction(e -> {
-            form.popup(e, selectManager(false), 315, 140); // TODO get optimal dimensions
-            if (manager != null)
+            selectManager(e, false);
+            if (manager != null) // TODO do I need this?
             {
                 populateTableView(controller.getManagerTeam(manager));
             }
@@ -184,7 +184,7 @@ public class Teams
         rows[0].getChildren().addAll(labels.get(names[1]), fields.get(names[1]));
 
         buttons.get(isCreate ? "Create" : "Update").setOnAction(isCreate ? this::submitForm : this::submitUpdate);
-        buttons.get("Select Manager").setOnAction(e -> form.popup(e, selectManager(!isCreate), 315, 140));
+        buttons.get("Select Manager").setOnAction(e -> selectManager(e, !isCreate));
         rows[0].getChildren().addAll(buttons.get("Select Manager"));
         rows[1] = new HBox(50, buttons.get(isCreate ? "Create" : "Update"), buttons.get("Cancel"));
         rows[1].setAlignment(BASELINE_CENTER);
@@ -227,15 +227,10 @@ public class Teams
         team.setTeamID(this.team.getTeamID());
         controller.updateTeam(team);
 
-        if (manager != null)
+        if (manager != team.getManager())
         {
             controller.setManagerOfTeam(this.team, manager);
         }
-        else if (team.getManager() != null)
-        {
-            controller.removeManagerFromTeam(team, team.getManager());
-        }
-
 
         populateTableView();
         form.closeThis(e);
@@ -244,56 +239,27 @@ public class Teams
     /**
      * <p>A GUI component used to select a Manager instance from all Manager instances available.</p>
      *
+     * @param e the event driving this method call
      * @param isUpdate informs the method whether this selection is for updating, or merely just selecting
-     * @return StackPane for selecting a Manager
      */
-    public StackPane selectManager(boolean isUpdate)
+    public void selectManager(ActionEvent e, boolean isUpdate)
     {
-        Label labelManagers = new Label("Select Manager");
-        AppTheme.set(labelManagers);
-        ComboBox<String> comboManagers = new ComboBox<>();
-
-        manager = (team == null ? null : team.getManager());
-        List<Manager> managers = controller.getManagers();
-        managers.forEach(m -> {
-            comboManagers.getItems().add(m.getFirstName() + " " + m.getLastName());
-            if (manager != null && m.getPersonID().equals(manager.getPersonID()))
-            {
-                comboManagers.getSelectionModel().select(comboManagers.getItems().size() - 1);
-            }
-        });
-
-        Map<String, Button> buttons = form.createButtonMap(new String[]{"Remove Manager", "Select", "Cancel"});
-        buttons.get("Cancel").setOnAction(form::closeThis);
-        buttons.get("Remove Manager").setOnAction(e -> {
-            manager = null;
-            comboManagers.getSelectionModel().select(-1);
-        });
-        buttons.get("Select").setOnAction(e -> {
-            int index = comboManagers.getSelectionModel().getSelectedIndex();
-            if (index != -1)
-            {
-                manager = managers.get(index);
-            }
-            form.closeThis(e);
-        });
-
-        HBox temp1 = new HBox(50);
-        if(isUpdate)
+        // Getting most up to date Team instance
+        if (team != null)
         {
-            temp1.getChildren().addAll(comboManagers, buttons.get("Remove Manager"));
+            team = controller.findTeam(team.getTeamID());
         }
-        else
-        {
-            temp1.getChildren().addAll(labelManagers, comboManagers);
-        }
-        HBox temp2 = new HBox(50, buttons.get("Select"), buttons.get("Cancel"));
-        temp1.setAlignment(CENTER);
-        temp2.setAlignment(CENTER);
 
-        VBox temp = new VBox(30, temp1, temp2);
-        temp.setPadding(new Insets(30, 20, 20, 20));
-        return new StackPane(temp);
+        Manager temp = (team == null ? null : controller.getTeamManager(team));
+
+        StackPane popup = selectionPopup.selectManager(temp, isUpdate);
+        form.popup(e, popup, 315, 140);
+        Object object = selectionPopup.getValue();
+
+        if (object instanceof Manager)
+        {
+            manager = (object != temp ? (Manager) object : manager);
+        }
     }
 
 }

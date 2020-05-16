@@ -32,4 +32,9 @@ public class Manager extends Person
         setDateOfBirth(dateOfBirth);
         setStarRating(starRating);
     }
+
+    public String toString()
+    {
+        return getFirstName() + " " + getMiddleName() + " " + getLastName();
+    }
 }

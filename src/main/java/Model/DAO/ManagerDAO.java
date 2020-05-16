@@ -1,6 +1,7 @@
 package Model.DAO;
 
 import Model.POJO.Manager;
+import Model.POJO.Player;
 
 import javax.persistence.*;
 import java.util.List;
@@ -94,6 +95,37 @@ public class ManagerDAO
         {
             em.close();
         }
+    }
+
+    public Manager find(long id)
+    {
+        EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
+        EntityTransaction et = null;
+        Manager manager = null;
+
+        try
+        {
+            et = em.getTransaction();
+            et.begin();
+
+            manager = em.find(Manager.class, id);
+
+            et.commit();
+        }
+        catch (Exception ex)
+        {
+            if (et != null)
+            {
+                et.rollback();
+            }
+            ex.printStackTrace();
+        }
+        finally
+        {
+            em.close();
+        }
+
+        return manager;
     }
 
     public List<Manager> getManagers()

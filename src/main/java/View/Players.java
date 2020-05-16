@@ -12,6 +12,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
+import javax.persistence.criteria.Selection;
 import java.util.List;
 import java.util.Map;
 
@@ -33,11 +34,13 @@ public class Players
     private ToggleGroup goalie;
     private Player player;
     private Team team;
+    private SelectionPopup selectionPopup;
 
     public Players(Controller controller)
     {
         this.controller = controller;
         form = new Form(controller);
+        selectionPopup = new SelectionPopup(form, controller);
     }
 
     /**
@@ -91,7 +94,7 @@ public class Players
         buttons.get("Update").setOnAction(this::update);
         buttons.get("Delete").setOnAction(e -> delete());
         buttons.get("Team Filter").setOnAction(e -> {
-            form.popup(e, selectTeam(false), 315, 140);
+            selectTeam(e, false);
             if (team != null)
             {
                 populateTableView(controller.getTeamPlayers(team));
@@ -241,7 +244,7 @@ public class Players
 
         buttons.get("Cancel").setOnAction(form::closeThis);
         buttons.get((isCreate ? "Create" : "Update")).setOnAction(isCreate ? this::submitForm : this::submitUpdate);
-        buttons.get("Select Team").setOnAction(e -> form.popup(e, selectTeam(!isCreate), 315, 140));
+        buttons.get("Select Team").setOnAction(e -> selectTeam(e, !isCreate));
 
         isGoalie = new RadioButton("Is Goalie");
         notGoalie = new RadioButton("Is Not Goalie");
@@ -302,10 +305,6 @@ public class Players
         {
             controller.setPlayersTeam(team, this.player);
         }
-        else if (player.getTeam() != null)
-        {
-            controller.removePlayerFromTeam(player.getTeam(), player);
-        }
 
         populateTableView();
         form.closeThis(e);
@@ -314,109 +313,28 @@ public class Players
     /**
      * <p>A GUI component used to select a Team instance from all Team instances available.</p>
      *
+     * @param e the event driving this method call
      * @param isUpdate informs the method whether this selection is for updating, or merely just selecting
-     * @return StackPane for selecting a Team
      */
-    public StackPane selectTeam(boolean isUpdate)
+    public void selectTeam(ActionEvent e, boolean isUpdate)
     {
-        Label labelTeams = new Label("Select Team");
-        AppTheme.set(labelTeams);
-        ComboBox<String> comboTeams = new ComboBox<>();
-
-        team = (player == null ? null : player.getTeam());
-        List<Team> teams = controller.getTeams();
-        teams.forEach(t -> {
-            comboTeams.getItems().add(t.getName());
-            if (team != null && t.getTeamID().equals(team.getTeamID()))
-            {
-                comboTeams.getSelectionModel().select(comboTeams.getItems().size() - 1);
-            }
-        });
-
-        Map<String, Button> buttons = form.createButtonMap(new String[]{"Remove Team", "Select", "Cancel"});
-        buttons.get("Cancel").setOnAction(form::closeThis);
-        buttons.get("Remove Team").setOnAction(e -> {
-            team = null;
-            comboTeams.getSelectionModel().select(-1);
-        });
-        buttons.get("Select").setOnAction(e -> {
-            int index = comboTeams.getSelectionModel().getSelectedIndex();
-            if (index != -1)
-            {
-                team = teams.get(index);
-            }
-            form.closeThis(e);
-        });
-
-        HBox temp1 = new HBox(50);
-        if(isUpdate)
+        // Getting most up to date Player instance
+        if (player != null)
         {
-            temp1.getChildren().addAll(comboTeams, buttons.get("Remove Team"));
-        }
-        else
-        {
-            temp1.getChildren().addAll(labelTeams, comboTeams);
-        }
-        HBox temp2 = new HBox(50, buttons.get("Select"), buttons.get("Cancel"));
-        temp1.setAlignment(CENTER);
-        temp2.setAlignment(CENTER);
-
-        VBox temp = new VBox(30, temp1, temp2);
-        temp.setPadding(new Insets(30, 20, 20, 20));
-        return new StackPane(temp);
-    }
-
-
-    public StackPane selectTeam(Team team)
-    {
-        Label label = new Label("Select Team");
-        AppTheme.set(label);
-
-        ComboBox<Team> combo = new ComboBox<>();
-        controller.getTeams().forEach(t -> combo.getItems().add(t));
-        combo.getSelectionModel().select(team);
-        Map<String, Button> buttons = getStringButtonMap(combo);
-
-        return new StackPane(buildPopup(label, combo, buttons));
-    }
-
-    private Map<String, Button> getStringButtonMap(ComboBox<Team> combo)
-    {
-        Map<String, Button> buttons = form.createButtonMap(new String[]{"Remove Team", "Select", "Cancel"});
-        buttons.get("Remove Team").setOnAction(e -> combo.getSelectionModel().select(null));
-        buttons.get("Cancel").setOnAction(form::closeThis);
-        buttons.get("Select").setOnAction(e -> {
-            setTeam(combo.getSelectionModel().getSelectedIndex() == -1 ? null : combo.getValue());
-            form.closeThis(e);
-        });
-        return buttons;
-    }
-
-    private VBox buildPopup(Label label, ComboBox<Team> combo, Map<String, Button> buttons)
-    {
-        // VBox
-        VBox temp = new VBox(25);
-        temp.setPadding(new Insets(50, 20, 20, 20));
-
-        // HBoxes
-        HBox[] set = {
-                new HBox(50, label, combo),
-                new HBox(50, buttons.get("Remove Team")),
-                new HBox(50, buttons.get("Select"), buttons.get("Cancel"))
-        };
-        for (HBox row : set)
-        {
-            row.setAlignment(BASELINE_CENTER);
-            temp.getChildren().add(row);
+            player = controller.findPlayer(player.getPersonID());
         }
 
-        // Return
-        return temp;
-    }
+        Team temp = (player == null ? null : controller.getPlayerTeam(player));
 
-    private void setTeam(Team team)
-    {
-        this.team = team;
+        StackPane popup = selectionPopup.selectTeam(temp, isUpdate);
+        form.popup(e, popup, 315, 140);
+        Object object = selectionPopup.getValue();
+
+        if (object instanceof Team)
+        {
+            team = (object != temp ? (Team) object : team);
+        }
     }
 
 }
+// 370 lines of code

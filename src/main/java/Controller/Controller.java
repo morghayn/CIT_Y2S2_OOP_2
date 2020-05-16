@@ -104,6 +104,11 @@ public class Controller
         return manager.getTeam();
     }
 
+    public Team getPlayerTeam(Player player)
+    {
+        return player.getTeam();
+    }
+
     public String getExtraPlayerDetails(Player player)
     {
         Team team = player.getTeam();
@@ -125,6 +130,23 @@ public class Controller
         );
     }
 
+    // Find
+
+    public Team findTeam(long id)
+    {
+        return teamDAO.find(id);
+    }
+
+    public Manager findManager(long id)
+    {
+        return managerDAO.find(id);
+    }
+
+    public Player findPlayer(long id)
+    {
+        return playerDAO.find(id);
+    }
+
     // Update
     public void updateManager(Manager manager)
     {
@@ -143,22 +165,36 @@ public class Controller
 
     public void setManagerOfTeam(Team team, Manager manager)
     {
-        Team prevTeam = manager.getTeam();
-        if (prevTeam != null)
+        if (team == null)
         {
-            prevTeam.setManager(null);
-            updateTeam(prevTeam);
+            removeManagerFromTeam(manager.getTeam(), manager);
         }
-        manager.setTeam(team);
-        team.setManager(manager);
-        updateTeam(team);
+        else
+        {
+            Team prevTeam = manager.getTeam();
+            if (prevTeam != null)
+            {
+                prevTeam.setManager(null);
+                updateTeam(prevTeam);
+            }
+            manager.setTeam(team);
+            team.setManager(manager);
+            updateTeam(team);
+        }
     }
 
     public void setPlayersTeam(Team team, Player player)
     {
-        player.setTeam(team);
-        team.addPlayer(player);
-        updateTeam(team);
+        if (team == null)
+        {
+            removePlayerFromTeam(player.getTeam(), player);
+        }
+        else
+        {
+            player.setTeam(team);
+            team.addPlayer(player);
+            updateTeam(team);
+        }
     }
 
     // DELETE

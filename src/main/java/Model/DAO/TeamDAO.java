@@ -1,5 +1,6 @@
 package Model.DAO;
 
+import Model.POJO.Manager;
 import Model.POJO.Team;
 
 import javax.persistence.*;
@@ -113,6 +114,37 @@ public class TeamDAO
             et.begin();
 
             team = em.find(Model.POJO.Team.class, teamID);
+
+            et.commit();
+        }
+        catch (Exception ex)
+        {
+            if (et != null)
+            {
+                et.rollback();
+            }
+            ex.printStackTrace();
+        }
+        finally
+        {
+            em.close();
+        }
+
+        return team;
+    }
+
+    public Team find(long id)
+    {
+        EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
+        EntityTransaction et = null;
+        Team team = null;
+
+        try
+        {
+            et = em.getTransaction();
+            et.begin();
+
+            team = em.find(Team.class, id);
 
             et.commit();
         }
