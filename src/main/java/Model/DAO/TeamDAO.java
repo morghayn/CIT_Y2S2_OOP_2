@@ -1,11 +1,13 @@
 package Model.DAO;
 
-import Model.POJO.Manager;
 import Model.POJO.Team;
 
 import javax.persistence.*;
 import java.util.List;
 
+/**
+ * Class responsible for communication with Team POJO
+ */
 public class TeamDAO
 {
 
@@ -16,6 +18,11 @@ public class TeamDAO
         this.ENTITY_MANAGER_FACTORY = ENTITY_MANAGER_FACTORY;
     }
 
+    /**
+     * <p>Persists a Team instance to the database.</p>
+     *
+     * @param team the Team object to be persists
+     */
     public void persist(Team team)
     {
         EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
@@ -43,6 +50,11 @@ public class TeamDAO
         }
     }
 
+    /**
+     * <p>Removes a specified Team instance from our database.</p>
+     *
+     * @param team the specified Team instance to be removed
+     */
     public void remove(Team team)
     {
         EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
@@ -70,6 +82,11 @@ public class TeamDAO
         }
     }
 
+    /**
+     * <p>Updates a Team instance in our database.</p>
+     *
+     * @param team the Team instance to be updated
+     */
     public void update(Team team)
     {
         EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
@@ -97,11 +114,13 @@ public class TeamDAO
         }
     }
 
-    public void update(long id)
-    {
-        update(getTeam(id));
-    }
-
+    // TODO this is duplication? of find()?
+    /**
+     * <p>Finds a Team of the specified ID in our database.</p>
+     *
+     * @param teamID the specified ID
+     * @return the Team which matches such an ID
+     */
     public Team getTeam(long teamID)
     {
         EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
@@ -133,6 +152,12 @@ public class TeamDAO
         return team;
     }
 
+    /**
+     * <p>Finds a Team of the specified ID in our database.</p>
+     *
+     * @param id the specified ID
+     * @return the Team which matches such an ID
+     */
     public Team find(long id)
     {
         EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
@@ -164,6 +189,11 @@ public class TeamDAO
         return team;
     }
 
+    /**
+     * <p>Retrieves list of all Teams in the database.</p>
+     *
+     * @return a list comprising of all Team instances in our database
+     */
     public List<Team> getTeams()
     {
         EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();

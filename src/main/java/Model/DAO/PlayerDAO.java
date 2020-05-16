@@ -5,6 +5,9 @@ import Model.POJO.Player;
 import javax.persistence.*;
 import java.util.List;
 
+/**
+ * Class responsible for communication with Player POJO
+ */
 public class PlayerDAO
 {
 
@@ -15,6 +18,11 @@ public class PlayerDAO
         this.ENTITY_MANAGER_FACTORY = ENTITY_MANAGER_FACTORY;
     }
 
+    /**
+     * <p>Persists a Player instance to the database.</p>
+     *
+     * @param player the Player object to be persisted
+     */
     public void persist(Player player)
     {
         EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
@@ -42,33 +50,11 @@ public class PlayerDAO
         }
     }
 
-    public void update(Player player)
-    {
-        EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
-        EntityTransaction et = null;
-
-        try
-        {
-            et = em.getTransaction();
-            et.begin();
-
-            em.merge(player);
-            et.commit();
-        }
-        catch (Exception ex)
-        {
-            if (et != null)
-            {
-                et.rollback();
-            }
-            ex.printStackTrace();
-        }
-        finally
-        {
-           em.close();
-        }
-    }
-
+    /**
+     * <p>Removes a specified Player instance from our database.</p>
+     *
+     * @param player the specified Player instance to be removed
+     */
     public void remove(Player player)
     {
         EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
@@ -96,6 +82,44 @@ public class PlayerDAO
         }
     }
 
+    /**
+     * <p>Updates a Player instance in our database.</p>
+     *
+     * @param player the Player instance to be updated
+     */
+    public void update(Player player)
+    {
+        EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
+        EntityTransaction et = null;
+
+        try
+        {
+            et = em.getTransaction();
+            et.begin();
+
+            em.merge(player);
+            et.commit();
+        }
+        catch (Exception ex)
+        {
+            if (et != null)
+            {
+                et.rollback();
+            }
+            ex.printStackTrace();
+        }
+        finally
+        {
+           em.close();
+        }
+    }
+
+    /**
+     * <p>Finds a Player of the specified ID in our database.</p>
+     *
+     * @param id the specified ID
+     * @return the Player which matches such an ID
+     */
     public Player find(long id)
     {
         EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
@@ -127,6 +151,11 @@ public class PlayerDAO
         return player;
     }
 
+    /**
+     * <p>Retrieves list of all Players in the database.</p>
+     *
+     * @return a list comprising of all Player instances in our database
+     */
     public List<Player> getPlayers()
     {
         EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
@@ -159,6 +188,13 @@ public class PlayerDAO
         return players;
     }
 
+    /**
+     * <p>Retrieves a list of all Player instances in the database that match the search phrase entered through the
+     * parameters.</p>
+     *
+     * @param search the search phrase to be used as a wild card search via JPQL
+     * @return the list of players that match the search phrase
+     */
     public List<Player> searchName(String search)
     {
         EntityManager em = ENTITY_MANAGER_FACTORY.createEntityManager();
