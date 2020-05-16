@@ -46,7 +46,10 @@ public class Controller
 
     public Team createTeam(String name, String jerseyColour)
     {
-        return new Team(name, jerseyColour);
+        Team temp = new Team();
+        temp.setName(name);
+        temp.setJerseyColour(jerseyColour);
+        return temp;
     }
 
     // Persist
@@ -146,12 +149,14 @@ public class Controller
             prevTeam.setManager(null);
             updateTeam(prevTeam);
         }
+        manager.setTeam(team);
         team.setManager(manager);
         updateTeam(team);
     }
 
     public void setPlayersTeam(Team team, Player player)
     {
+        player.setTeam(team);
         team.addPlayer(player);
         updateTeam(team);
     }
