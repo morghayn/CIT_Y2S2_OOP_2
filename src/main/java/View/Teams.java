@@ -171,6 +171,7 @@ public class Teams
      * creating information regarding the domain of concern.</p>
      *
      * @param isCreate a boolean which helps the method distinguish what type of form is currently needed
+     * @return the StackPane for the playerLayout
      */
     public StackPane teamLayout(boolean isCreate)
     {
