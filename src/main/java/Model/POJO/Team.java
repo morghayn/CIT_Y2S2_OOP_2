@@ -55,4 +55,9 @@ public class Team
         this.manager = null;
         manager.setTeam(null);
     }
+
+    public String toString()
+    {
+        return name;
+    }
 }

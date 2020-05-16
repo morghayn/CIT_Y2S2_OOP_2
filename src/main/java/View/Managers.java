@@ -265,7 +265,6 @@ public class Managers
         AppTheme.set(labelTeams);
         ComboBox<String> comboTeams = new ComboBox<>();
 
-        team = (manager == null ? null : manager.getTeam());
         List<Team> teams = controller.getTeams();
         teams.forEach(t -> {
             comboTeams.getItems().add(t.getName());

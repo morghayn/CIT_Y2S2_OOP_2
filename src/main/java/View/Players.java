@@ -366,4 +366,57 @@ public class Players
         return new StackPane(temp);
     }
 
+
+    public StackPane selectTeam(Team team)
+    {
+        Label label = new Label("Select Team");
+        AppTheme.set(label);
+
+        ComboBox<Team> combo = new ComboBox<>();
+        controller.getTeams().forEach(t -> combo.getItems().add(t));
+        combo.getSelectionModel().select(team);
+        Map<String, Button> buttons = getStringButtonMap(combo);
+
+        return new StackPane(buildPopup(label, combo, buttons));
+    }
+
+    private Map<String, Button> getStringButtonMap(ComboBox<Team> combo)
+    {
+        Map<String, Button> buttons = form.createButtonMap(new String[]{"Remove Team", "Select", "Cancel"});
+        buttons.get("Remove Team").setOnAction(e -> combo.getSelectionModel().select(null));
+        buttons.get("Cancel").setOnAction(form::closeThis);
+        buttons.get("Select").setOnAction(e -> {
+            setTeam(combo.getSelectionModel().getSelectedIndex() == -1 ? null : combo.getValue());
+            form.closeThis(e);
+        });
+        return buttons;
+    }
+
+    private VBox buildPopup(Label label, ComboBox<Team> combo, Map<String, Button> buttons)
+    {
+        // VBox
+        VBox temp = new VBox(25);
+        temp.setPadding(new Insets(50, 20, 20, 20));
+
+        // HBoxes
+        HBox[] set = {
+                new HBox(50, label, combo),
+                new HBox(50, buttons.get("Remove Team")),
+                new HBox(50, buttons.get("Select"), buttons.get("Cancel"))
+        };
+        for (HBox row : set)
+        {
+            row.setAlignment(BASELINE_CENTER);
+            temp.getChildren().add(row);
+        }
+
+        // Return
+        return temp;
+    }
+
+    private void setTeam(Team team)
+    {
+        this.team = team;
+    }
+
 }

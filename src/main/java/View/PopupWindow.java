@@ -5,7 +5,7 @@ import javafx.scene.control.Alert;
 /**
  * <p>A simple helper class for displaying a generic popup window.</p>
  */
-class PopupWindow
+public class PopupWindow
 {
     /**
      * <p>The constructor instantiates a modal alert window tailored to the parameters passed to it.</p>
@@ -13,7 +13,7 @@ class PopupWindow
      * @param title   the title that will be applied to the alert window
      * @param message the message that will be displayed within the alert window
      */
-    PopupWindow(String title, String message)
+    public PopupWindow(String title, String message)
     {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
