@@ -1,9 +1,12 @@
 package View;
 
 import Controller.Controller;
-import Model.POJO.Manager;
 import Model.POJO.Player;
 import Model.POJO.Team;
+import View.Popup.PopupNotify;
+import View.Popup.SelectionPopup;
+import View.Util.AppTheme;
+import View.Util.FormFunctionality;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
@@ -12,17 +15,15 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
-import javax.persistence.criteria.Selection;
 import java.util.List;
 import java.util.Map;
 
 import static javafx.geometry.Pos.*;
-import static javafx.geometry.Pos.CENTER;
 
 public class Players
 {
 
-    private final Form form;
+    private final FormFunctionality form;
     private final Controller controller;
     private TableView<Player> tableView;
 
@@ -39,7 +40,7 @@ public class Players
     public Players(Controller controller)
     {
         this.controller = controller;
-        form = new Form(controller);
+        form = new FormFunctionality(controller);
         selectionPopup = new SelectionPopup(form, controller);
     }
 
@@ -116,18 +117,18 @@ public class Players
     /**
      * <p>If a valid selection is made within the TableView within this class, this method will attempt to retrieve
      * extra information pertaining the object selected within the TableView. If a valid selection is not found
-     * within the TableView, an error will be displayed through an instance of ${@link PopupWindow}.</p>
+     * within the TableView, an error will be displayed through an instance of ${@link PopupNotify}.</p>
      */
     public void extraPlayerDetails()
     {
         if (tableView.getSelectionModel().getSelectedIndex() != -1)
         {
             player = tableView.getSelectionModel().getSelectedItem();
-            new PopupWindow("", controller.getExtraPlayerDetails(player));
+            new PopupNotify("", controller.getExtraPlayerDetails(player));
         }
         else
         {
-            new PopupWindow("Update Error", "No valid table selection.");
+            new PopupNotify("Update Error", "No valid table selection.");
         }
     }
 
@@ -135,7 +136,7 @@ public class Players
      * <p>Attempts to begin the update process for the currently selected domain object within the TableView of this
      * class. If such a selection is valid, this method will act as a driver method, working in conjunction with other
      * methods such as ${@link #submitUpdate(ActionEvent)}. If such a selection is not valid, an error message will be
-     * delivered to the end user via a popup instance of ${@link PopupWindow}.</p>
+     * delivered to the end user via a popup instance of ${@link PopupNotify}.</p>
      *
      * @param e the ActionEvent in which is driving this event. Used to close down the window opened during this
      *          process
@@ -158,7 +159,7 @@ public class Players
         }
         else
         {
-            new PopupWindow("Update Error", "No valid table selection.");
+            new PopupNotify("Update Error", "No valid table selection.");
         }
     }
 
@@ -175,7 +176,7 @@ public class Players
         }
         else
         {
-            new PopupWindow("Removal Error", "No valid table selection.");
+            new PopupNotify("Removal Error", "No valid table selection.");
         }
     }
 
@@ -224,7 +225,7 @@ public class Players
     }
 
     /**
-     * <p>A multi-purpose method, which works in conjunction with {@link Form} to build forms for either updating or
+     * <p>A multi-purpose method, which works in conjunction with {@link FormFunctionality} to build forms for either updating or
      * creating information regarding the domain of concern.</p>
      *
      * @param isCreate a boolean which helps the method distinguish what type of form is currently needed

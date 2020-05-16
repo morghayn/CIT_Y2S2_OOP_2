@@ -1,7 +1,8 @@
-package View;
+package View.Util;
 
 import Controller.Controller;
 import Model.POJO.*;
+import View.Util.AppTheme;
 import javafx.event.ActionEvent;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -19,12 +20,12 @@ import java.util.function.UnaryOperator;
 
 import static java.lang.Integer.parseInt;
 
-public class Form
+public class FormFunctionality
 {
 
     private final Controller controller;
 
-    public Form(Controller controller)
+    public FormFunctionality(Controller controller)
     {
         this.controller = controller;
     }
@@ -61,7 +62,7 @@ public class Form
         return fields;
     }
 
-    Map<String, Label> createLabelMap(String[] names)
+    public Map<String, Label> createLabelMap(String[] names)
     {
         Map<String, Label> labels = new HashMap<>();
         for (String name : names)
@@ -73,7 +74,7 @@ public class Form
         return labels;
     }
 
-    Map<String, Button> createButtonMap(String[] names)
+    public Map<String, Button> createButtonMap(String[] names)
     {
         Map<String, Button> buttons = new HashMap<>();
         for (String name : names)

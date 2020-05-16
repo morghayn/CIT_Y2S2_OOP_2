@@ -19,7 +19,6 @@ public class Main extends Application
 {
 
     private final EntityManagerFactory ENTITY_MANAGER_FACTORY = Persistence.createEntityManagerFactory("league");
-    private Controller controller;
     private TabPane tabPane;
 
     @Override
@@ -49,7 +48,7 @@ public class Main extends Application
 
     private void setup()
     {
-        controller = new Controller(ENTITY_MANAGER_FACTORY);
+        Controller controller = new Controller(ENTITY_MANAGER_FACTORY);
 
         tabPane = new TabPane();
         Tab home = new Tab();
@@ -62,7 +61,7 @@ public class Main extends Application
         players.setText("Players");
         teams.setText("Teams");
 
-        home.setContent(new Home().setup());
+        home.setContent(new Home(ENTITY_MANAGER_FACTORY, controller).setup());
         managers.setContent(new Managers(controller).setup());
         players.setContent(new Players(controller).setup());
         teams.setContent(new Teams(controller).setup());

@@ -3,6 +3,9 @@ package View;
 import Controller.Controller;
 import Model.POJO.Manager;
 import Model.POJO.Team;
+import View.Popup.PopupNotify;
+import View.Popup.SelectionPopup;
+import View.Util.FormFunctionality;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
@@ -18,7 +21,7 @@ import static javafx.geometry.Pos.BASELINE_CENTER;
 public class Teams
 {
 
-    private final Form form;
+    private final FormFunctionality form;
     private final Controller controller;
     private TableView<Team> tableView;
 
@@ -32,7 +35,7 @@ public class Teams
     public Teams(Controller controller)
     {
         this.controller = controller;
-        form = new Form(controller);
+        form = new FormFunctionality(controller);
         selectionPopup = new SelectionPopup(form, controller);
     }
 
@@ -81,7 +84,7 @@ public class Teams
      * <p>Attempts to begin the update process for the currently selected domain object within the TableView of this
      * class. If such a selection is valid, this method will act as a driver method, working in conjunction with other
      * methods such as ${@link #submitUpdate(ActionEvent)}. If such a selection is not valid, an error message will be
-     * delivered to the end user via a popup instance of ${@link PopupWindow}.</p>
+     * delivered to the end user via a popup instance of ${@link PopupNotify}.</p>
      *
      * @param e the ActionEvent in which is driving this event. Used to close down the window opened during this
      *          process
@@ -98,7 +101,7 @@ public class Teams
         }
         else
         {
-            new PopupWindow("Update Error", "No valid table selection.");
+            new PopupNotify("Update Error", "No valid table selection.");
         }
     }
 
@@ -115,7 +118,7 @@ public class Teams
         }
         else
         {
-            new PopupWindow("Removal Error", "No valid table selection.");
+            new PopupNotify("Removal Error", "No valid table selection.");
         }
     }
 
@@ -164,7 +167,7 @@ public class Teams
     }
 
     /**
-     * <p>A multi-purpose method, which works in conjunction with {@link Form} to build forms for either updating or
+     * <p>A multi-purpose method, which works in conjunction with {@link FormFunctionality} to build forms for either updating or
      * creating information regarding the domain of concern.</p>
      *
      * @param isCreate a boolean which helps the method distinguish what type of form is currently needed

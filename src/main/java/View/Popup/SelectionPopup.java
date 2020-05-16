@@ -1,8 +1,10 @@
-package View;
+package View.Popup;
 
 import Controller.Controller;
 import Model.POJO.Manager;
 import Model.POJO.Team;
+import View.Util.AppTheme;
+import View.Util.FormFunctionality;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -17,11 +19,11 @@ import java.util.Map;
 public class SelectionPopup
 {
 
-    private final Form form;
+    private final FormFunctionality form;
     private final Controller controller;
     private Object selection;
 
-    public SelectionPopup(Form form, Controller controller)
+    public SelectionPopup(FormFunctionality form, Controller controller)
     {
         this.form = form;
         this.controller = controller;
