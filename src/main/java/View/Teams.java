@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import static javafx.geometry.Pos.BASELINE_CENTER;
+import static javafx.geometry.Pos.CENTER;
 
 public class Teams
 {
@@ -59,12 +60,12 @@ public class Teams
     {
         Map<String, Button> buttons = form.createButtonMap(new String[]{"Create", "List", "Update", "Delete", "Manager's Team"});
 
-        buttons.get("Create").setOnAction(e -> form.popup(e, teamLayout(true), 920, 280));
+        buttons.get("Create").setOnAction(e -> form.popup(e, teamLayout(true), 750, 200));
         buttons.get("List").setOnAction(e -> populateTableView());
         buttons.get("Update").setOnAction(this::update);
         buttons.get("Delete").setOnAction(e -> delete());
         buttons.get("Manager's Team").setOnAction(e -> {
-            form.popup(e, selectManager(), 375, 185); // TODO get optimal dimensions
+            form.popup(e, selectManager(false), 315, 140); // TODO get optimal dimensions
             if (manager != null)
             {
                 populateTableView(controller.getManagerTeam(manager));
@@ -93,7 +94,7 @@ public class Teams
             StackPane temp = teamLayout(false);
             fields.get("Team Name").setText(team.getName());
             fields.get("Jersey Colour").setText(team.getJerseyColour());
-            form.popup(e, temp, 920, 280);
+            form.popup(e, temp, 750, 200);
         }
         else
         {
@@ -183,11 +184,12 @@ public class Teams
         rows[0].getChildren().addAll(labels.get(names[1]), fields.get(names[1]));
 
         buttons.get(isCreate ? "Create" : "Update").setOnAction(isCreate ? this::submitForm : this::submitUpdate);
-        buttons.get("Select Manager").setOnAction(e -> form.popup(e, selectManager(), 920, 280));
+        buttons.get("Select Manager").setOnAction(e -> form.popup(e, selectManager(!isCreate), 315, 140));
         rows[0].getChildren().addAll(buttons.get("Select Manager"));
-        rows[1] = new HBox(25, buttons.get(isCreate ? "Create" : "Update"), buttons.get("Cancel"));
+        rows[1] = new HBox(50, buttons.get(isCreate ? "Create" : "Update"), buttons.get("Cancel"));
+        rows[1].setAlignment(BASELINE_CENTER);
 
-        VBox temp = new VBox(25, rows[0], rows[1]);
+        VBox temp = new VBox(40, rows[0], rows[1]);
         temp.setPadding(new Insets(50, 20, 20, 20));
         return new StackPane(temp);
     }
@@ -240,15 +242,16 @@ public class Teams
     }
 
     /**
-     * <p> A GUI component used to select a Manager instance from all Manager instances available </p>
+     * <p>A GUI component used to select a Manager instance from all Manager instances available.</p>
      *
-     * @return a StackPane for selecting a Manager
+     * @param isUpdate informs the method whether this selection is for updating, or merely just selecting
+     * @return StackPane for selecting a Manager
      */
-    public StackPane selectManager()
+    public StackPane selectManager(boolean isUpdate)
     {
         Label labelManagers = new Label("Select Manager");
-        ComboBox<String> comboManagers = new ComboBox<>();
         AppTheme.set(labelManagers);
+        ComboBox<String> comboManagers = new ComboBox<>();
 
         manager = (team == null ? null : team.getManager());
         List<Manager> managers = controller.getManagers();
@@ -275,15 +278,21 @@ public class Teams
             form.closeThis(e);
         });
 
-        HBox temp1 = new HBox(50, labelManagers, comboManagers);
-        HBox temp2 = new HBox(50, buttons.get("Remove Manager"));
-        HBox temp3 = new HBox(50, buttons.get("Select"), buttons.get("Cancel"));
-        temp1.setAlignment(BASELINE_CENTER);
-        temp2.setAlignment(BASELINE_CENTER);
-        temp3.setAlignment(BASELINE_CENTER);
+        HBox temp1 = new HBox(50);
+        if(isUpdate)
+        {
+            temp1.getChildren().addAll(comboManagers, buttons.get("Remove Manager"));
+        }
+        else
+        {
+            temp1.getChildren().addAll(labelManagers, comboManagers);
+        }
+        HBox temp2 = new HBox(50, buttons.get("Select"), buttons.get("Cancel"));
+        temp1.setAlignment(CENTER);
+        temp2.setAlignment(CENTER);
 
-        VBox temp = new VBox(25, temp1, temp2, temp3);
-        temp.setPadding(new Insets(50, 20, 20, 20));
+        VBox temp = new VBox(30, temp1, temp2);
+        temp.setPadding(new Insets(30, 20, 20, 20));
         return new StackPane(temp);
     }
 

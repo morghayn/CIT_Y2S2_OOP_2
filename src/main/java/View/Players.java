@@ -15,8 +15,8 @@ import javafx.scene.layout.VBox;
 import java.util.List;
 import java.util.Map;
 
-import static javafx.geometry.Pos.BASELINE_CENTER;
-import static javafx.geometry.Pos.BASELINE_LEFT;
+import static javafx.geometry.Pos.*;
+import static javafx.geometry.Pos.CENTER;
 
 public class Players
 {
@@ -91,7 +91,7 @@ public class Players
         buttons.get("Update").setOnAction(this::update);
         buttons.get("Delete").setOnAction(e -> delete());
         buttons.get("Team Filter").setOnAction(e -> {
-            form.popup(e, selectTeam(), 375, 185); // TODO get optimal dimensions
+            form.popup(e, selectTeam(false), 315, 140);
             if (team != null)
             {
                 populateTableView(controller.getTeamPlayers(team));
@@ -241,7 +241,7 @@ public class Players
 
         buttons.get("Cancel").setOnAction(form::closeThis);
         buttons.get((isCreate ? "Create" : "Update")).setOnAction(isCreate ? this::submitForm : this::submitUpdate);
-        buttons.get("Select Team").setOnAction(e -> form.popup(e, selectTeam(), 375, 185)); // TODO get optimal dimensions
+        buttons.get("Select Team").setOnAction(e -> form.popup(e, selectTeam(!isCreate), 315, 140));
 
         isGoalie = new RadioButton("Is Goalie");
         notGoalie = new RadioButton("Is Not Goalie");
@@ -314,13 +314,14 @@ public class Players
     /**
      * <p>A GUI component used to select a Team instance from all Team instances available.</p>
      *
-     * @return a StackPane for selecting a Team
+     * @param isUpdate informs the method whether this selection is for updating, or merely just selecting
+     * @return StackPane for selecting a Team
      */
-    public StackPane selectTeam()
+    public StackPane selectTeam(boolean isUpdate)
     {
         Label labelTeams = new Label("Select Team");
-        ComboBox<String> comboTeams = new ComboBox<>();
         AppTheme.set(labelTeams);
+        ComboBox<String> comboTeams = new ComboBox<>();
 
         team = (player == null ? null : player.getTeam());
         List<Team> teams = controller.getTeams();
@@ -347,15 +348,21 @@ public class Players
             form.closeThis(e);
         });
 
-        HBox temp1 = new HBox(50, labelTeams, comboTeams);
-        HBox temp2 = new HBox(50, buttons.get("Remove Team"));
-        HBox temp3 = new HBox(50, buttons.get("Select"), buttons.get("Cancel"));
-        temp1.setAlignment(BASELINE_CENTER);
-        temp2.setAlignment(BASELINE_CENTER);
-        temp3.setAlignment(BASELINE_CENTER);
+        HBox temp1 = new HBox(50);
+        if(isUpdate)
+        {
+            temp1.getChildren().addAll(comboTeams, buttons.get("Remove Team"));
+        }
+        else
+        {
+            temp1.getChildren().addAll(labelTeams, comboTeams);
+        }
+        HBox temp2 = new HBox(50, buttons.get("Select"), buttons.get("Cancel"));
+        temp1.setAlignment(CENTER);
+        temp2.setAlignment(CENTER);
 
-        VBox temp = new VBox(25, temp1, temp2, temp3);
-        temp.setPadding(new Insets(50, 20, 20, 20));
+        VBox temp = new VBox(30, temp1, temp2);
+        temp.setPadding(new Insets(30, 20, 20, 20));
         return new StackPane(temp);
     }
 
