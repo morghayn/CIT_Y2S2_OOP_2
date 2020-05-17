@@ -21,7 +21,6 @@ public class createManagers
         controller = new Controller(ENTITY_MANAGER_FACTORY);
     }
 
-    @Test
     public void create(int amountToCreateForTest)
     {
         // Counting current quantity of managers in our database

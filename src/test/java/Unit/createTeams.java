@@ -18,7 +18,6 @@ public class createTeams
         controller = new Controller(ENTITY_MANAGER_FACTORY);
     }
 
-    @Test
     public void create(int amountToCreateForTest)
     {
         // Counting current quantity of teams in our database

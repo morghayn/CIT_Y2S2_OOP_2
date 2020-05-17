@@ -20,7 +20,6 @@ public class createPlayers
         controller = new Controller(ENTITY_MANAGER_FACTORY);
     }
 
-    @Test
     public void create(int amountToCreateForTest)
     {
         // Counting current quantity of players in our database

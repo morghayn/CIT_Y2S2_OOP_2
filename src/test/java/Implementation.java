@@ -1,7 +1,7 @@
 import Unit.createManagers;
 import Unit.createPlayers;
 import Unit.createTeams;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
